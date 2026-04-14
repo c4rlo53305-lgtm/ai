@@ -3,32 +3,27 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Face Restorer Extreme - GFPGAN</title>
+    <title>AI Face Restorer - Tencent ARC</title>
     <style>
-        :root { --accent: #ff0055; --bg: #0d1117; --card: #161b22; }
+        :root { --accent: #00f2ff; --bg: #0d1117; --card: #161b22; }
         body { font-family: 'Segoe UI', sans-serif; background-color: var(--bg); color: white; margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; }
         .container { max-width: 600px; width: 100%; text-align: center; }
         header { margin-bottom: 25px; }
-        h1 { color: var(--accent); margin: 0; font-size: 2rem; text-transform: uppercase; letter-spacing: 1px; }
-        p { color: #8b949e; margin: 5px 0 0; }
+        h1 { color: var(--accent); margin: 0; font-size: 1.8rem; text-transform: uppercase; }
         
-        .upload-box { background: var(--card); border: 2px dashed var(--accent); padding: 40px; border-radius: 20px; cursor: pointer; margin-bottom: 25px; transition: 0.3s; position: relative; }
-        .upload-box:hover { background: rgba(255, 0, 85, 0.05); }
-        #dropText { font-size: 1.1rem; color: #c9d1d9; }
+        .upload-box { background: var(--card); border: 2px dashed var(--accent); padding: 40px; border-radius: 20px; cursor: pointer; margin-bottom: 25px; transition: 0.3s; }
+        .upload-box:hover { background: rgba(0, 242, 255, 0.05); }
         
-        .btn-ai { width: 100%; padding: 18px; border: none; border-radius: 12px; background: linear-gradient(90deg, #ff0055, #ff4d00); color: white; font-weight: bold; font-size: 1.2rem; cursor: pointer; display: none; transition: 0.3s; letter-spacing: 1px; box-shadow: 0 4px 15px rgba(255, 0, 85, 0.3); }
-        .btn-ai:hover { filter: brightness(1.1); transform: translateY(-2px); }
-        .btn-ai:disabled { background: #4b5563; background-image: none; opacity: 0.7; cursor: not-allowed; transform: none; box-shadow: none; }
+        .btn-ai { width: 100%; padding: 18px; border: none; border-radius: 12px; background: linear-gradient(90deg, #00f2ff, #0072ff); color: white; font-weight: bold; font-size: 1.2rem; cursor: pointer; transition: 0.3s; }
+        .btn-ai:disabled { background: #4b5563; opacity: 0.7; cursor: not-allowed; }
 
-        .results { display: grid; grid-template-columns: 1fr; gap: 20px; margin-top: 25px; display: none; }
+        .results { display: grid; grid-template-columns: 1fr; gap: 20px; margin-top: 25px; }
         .canvas-card { background: var(--card); padding: 15px; border-radius: 15px; border: 1px solid #30363d; }
-        .canvas-card h3 { margin: 0 0 10px; color: #8b949e; font-weight: 500; font-size: 0.9rem; text-transform: uppercase; }
         img { width: 100%; border-radius: 10px; background: #000; min-height: 200px; object-fit: contain; }
 
-        #loader { display: none; margin: 20px 0; color: var(--accent); font-weight: bold; font-size: 1.1rem; animation: pulse 1.5s infinite; }
+        #loader { display: none; margin: 20px 0; color: var(--accent); font-weight: bold; animation: pulse 1.5s infinite; }
         @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
-        
-        #errorBox { display: none; background: rgba(255, 0, 0, 0.1); color: #ff6b6b; border: 1px solid #ff6b6b; padding: 15px; border-radius: 10px; margin-top: 20px; font-size: 0.9rem; text-align: left; }
+        #errorBox { display: none; background: rgba(255, 0, 0, 0.1); color: #ff6b6b; padding: 15px; border-radius: 10px; margin-top: 20px; font-size: 0.9rem; }
     </style>
 </head>
 <body>
@@ -36,125 +31,92 @@
 <div class="container">
     <header>
         <h1>AI Face Restorer</h1>
-        <p>Potenciado por GFPGAN (Servidor Externo)</p>
+        <p>Modelo Oficial: Tencent ARC GFPGAN</p>
     </header>
 
-    <div id="dropZone" class="upload-box">
-        <p id="dropText">Toca aquí para seleccionar tu foto borrosa</p>
+    <div class="upload-box" onclick="document.getElementById('fileInput').click()">
+        <p id="statusText">Selecciona la foto para restaurar</p>
         <input type="file" id="fileInput" accept="image/*" style="display:none">
     </div>
 
-    <button id="btnAi" class="btn-ai" disabled>RECONSTRUIR CARA CON IA</button>
-    
-    <div id="loader">⚡ La IA está trabajando... Esto tarda de 10 a 30 segundos.</div>
-    
+    <button id="btnAi" class="btn-ai" disabled>RECONSTRUIR CARA AHORA</button>
+    <div id="loader">⚡ Procesando... (Puede tardar hasta 30 segundos)</div>
     <div id="errorBox"></div>
 
-    <div id="results" class="results">
+    <div id="results" class="results" style="display:none;">
         <div class="canvas-card">
-            <h3>ORIGINAL BORROSA</h3>
-            <img id="imgOri" src="">
+            <h3>ORIGINAL</h3>
+            <img id="imgOri">
         </div>
         <div class="canvas-card">
-            <h3>RESULTADO IA (GFPGAN)</h3>
-            <img id="imgRes" src="">
-            <button id="btnDown" style="margin-top:15px; background: #2188ff; border:none; color:white; padding:12px 20px; border-radius:8px; cursor:pointer; font-weight:bold; width: 100%;">DESCARGAR FOTO HD</button>
+            <h3>RESULTADO HD</h3>
+            <img id="imgRes">
+            <button id="btnDown" style="margin-top:15px; background: #2188ff; border:none; color:white; padding:12px 20px; border-radius:8px; cursor:pointer; font-weight:bold; width: 100%;">DESCARGAR FOTO</button>
         </div>
     </div>
 </div>
 
 <script>
-    // CONFIGURACIÓN CON TU TOKEN Y EL MODELO GFPGAN
     const HF_TOKEN = "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"; 
-    // Usamos un espacio de Hugging Face que corre GFPGANv1.4, el mejor para caras
-    const API_URL = "https://api-inference.huggingface.co/models/vladb/gfpgan-v1-4";
+    const API_URL = "https://api-inference.huggingface.co/models/tencentarc/GFPGAN";
 
     const fileInput = document.getElementById('fileInput');
     const btnAi = document.getElementById('btnAi');
     const imgOri = document.getElementById('imgOri');
     const imgRes = document.getElementById('imgRes');
     const loader = document.getElementById('loader');
-    const results = document.getElementById('results');
     const errorBox = document.getElementById('errorBox');
 
     fileInput.onchange = (e) => {
         const file = e.target.files[0];
         if (file) {
-            // Mostrar original
             imgOri.src = URL.createObjectURL(file);
-            btnAi.style.display = 'block';
+            document.getElementById('results').style.display = 'grid';
             btnAi.disabled = false;
-            results.style.display = 'grid';
-            imgRes.src = ""; // Limpiar resultado anterior
             errorBox.style.display = 'none';
-            document.getElementById('dropText').textContent = "Imagen cargada: " + file.name;
         }
     };
 
     btnAi.onclick = async () => {
-        const file = fileInput.files[0];
-        if (!file) return;
-
         btnAi.disabled = true;
         loader.style.display = 'block';
-        imgRes.src = ""; // Limpiar resultado anterior
         errorBox.style.display = 'none';
 
         try {
-            // ENVIAR IMAGEN A LA API (GFPGAN)
             const response = await fetch(API_URL, {
                 headers: { 
                     "Authorization": `Bearer ${HF_TOKEN}`,
-                    "Content-Type": file.type 
+                    "Content-Type": "application/octet-stream"
                 },
                 method: "POST",
-                body: file,
+                body: fileInput.files[0],
             });
 
-            // Manejo de errores de la API
             if (!response.ok) {
-                const errorData = await response.json();
-                
-                // Error común: El modelo está "dormido" y tardará en cargar
-                if (errorData.error && errorData.error.includes("loading")) {
-                    throw new Error("La IA en el servidor se está 'despertando'. Esto es normal la primera vez. Por favor, espera 20 segundos y vuelve a pulsar el botón.");
+                const err = await response.json();
+                if (err.error && err.error.includes("loading")) {
+                    throw new Error("El servidor se está activando. Reintenta en 20 segundos.");
                 }
-                
-                throw new Error(errorData.error || "Error desconocido en el servidor de IA.");
+                throw new Error(err.error || "Error en la conexión");
             }
 
-            // Recibir la imagen procesada (Blob)
             const blob = await response.blob();
-            
-            // Validar que lo recibido sea realmente una imagen
-            if (!blob.type.startsWith('image/')) {
-                throw new Error("El servidor no devolvió una imagen válida. Intenta de nuevo.");
-            }
-
-            // Mostrar resultado final
             imgRes.src = URL.createObjectURL(blob);
-            document.getElementById('dropText').textContent = "¡Restauración completada!";
-
         } catch (err) {
-            console.error("Error en la restauración:", err);
             errorBox.style.display = 'block';
-            errorBox.innerHTML = `<strong>Hubo un problema:</strong><br>${err.message}`;
-            document.getElementById('dropText').textContent = "Error en el proceso.";
+            errorBox.innerText = err.message;
         } finally {
             btnAi.disabled = false;
             loader.style.display = 'none';
         }
     };
 
-    // Funcionalidad de descarga
     document.getElementById('btnDown').onclick = () => {
-        if (!imgRes.src) return;
-        const link = document.createElement('a');
-        link.download = `restored_face_${Date.now()}.png`;
-        link.href = imgRes.src;
-        link.click();
+        const a = document.createElement('a');
+        a.href = imgRes.src;
+        a.download = "foto_hd.png";
+        a.click();
     };
 </script>
-
 </body>
 </html>
