@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>📸 Restaurador con IA — De Verdad Funciona</title>
+    <title>📸 Restaurador con IA — Hugging Face</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
     <style>
@@ -17,10 +17,6 @@
             background:linear-gradient(135deg, #4F46E5 0%, #7C3AED 100%);
             -webkit-background-clip:text;
             -webkit-text-fill-color:transparent;
-        }
-        .card-hover:hover{
-            transform:translateY(-5px);
-            box-shadow:0 20px 40px rgba(79,70,229,0.15);
         }
         .loader {
             border: 4px solid rgba(255,255,255,0.2);
@@ -45,7 +41,6 @@
 </head>
 <body class="min-h-screen">
 
-    <!-- 🔝 NAVEGACIÓN -->
     <nav class="fixed top-0 left-0 right-0 z-50 bg-white/90 backdrop-blur-md shadow-sm">
         <div class="max-w-7xl mx-auto px-4">
             <div class="flex justify-between items-center py-3">
@@ -55,14 +50,13 @@
                 </div>
                 <div class="hidden md:flex items-center gap-4">
                     <span class="text-sm text-green-600 font-medium flex items-center gap-1">
-                        <i class="fa fa-bolt"></i> IA Real en línea
+                        <i class="fa fa-bolt"></i> Hugging Face IA
                     </span>
                 </div>
             </div>
         </div>
     </nav>
 
-    <!-- 🦸 SECCIÓN PRINCIPAL -->
     <section class="hero-gradient pt-28 pb-20 min-h-screen">
         <div class="max-w-4xl mx-auto px-4">
             <div class="text-center mb-12">
@@ -71,46 +65,41 @@
                     <span class="gradient-text">Inteligencia Artificial</span> ✨
                 </h1>
                 <p class="text-lg text-gray-300 max-w-2xl mx-auto">
-                    Colorea fotos en blanco y negro, elimina rasguños y mejora la resolución. 
-                    <strong>Con IA real de Replicate.</strong> Resultados en segundos.
+                    Colorea, repara y mejora tus fotos. Conectado directo a Hugging Face.
                 </p>
             </div>
 
-            <!-- 📤 ÁREA DE SUBIDA -->
             <div class="bg-white rounded-3xl p-6 sm:p-10 shadow-2xl mb-10">
                 <div id="zonaSubida" class="border-3 border-dashed border-indigo-300 rounded-2xl p-10 text-center cursor-pointer hover:border-indigo-500 hover:bg-indigo-50/50 transition-all pulse-border">
                     <input type="file" id="entradaImagen" accept="image/*" class="hidden">
                     <span class="text-5xl mb-4 block">📤</span>
                     <h3 class="text-xl font-bold text-gray-800 mb-2">Arrastra tu foto aquí</h3>
                     <p class="text-gray-500 mb-2">o haz clic para seleccionarla</p>
-                    <p class="text-sm text-gray-400">JPG, PNG · Tamaño máximo: 10MB</p>
+                    <p class="text-sm text-gray-400">JPG, PNG · Tamaño máximo: 5MB</p>
                 </div>
 
-                <!-- 📷 PREVISUALIZACIÓN -->
                 <div id="zonaPreview" class="hidden mt-8">
                     <div class="rounded-xl overflow-hidden shadow-lg mb-6">
                         <img id="previewImg" alt="Vista previa" class="w-full h-auto max-h-80 object-contain bg-gray-100">
                     </div>
                     
-                    <!-- ⚙️ OPCIONES -->
                     <h3 class="text-lg font-bold text-gray-800 mb-4">⚙️ ¿Qué quieres hacer?</h3>
                     <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
-                        <button class="opcion-btn bg-amber-50 hover:bg-amber-100 border-2 border-amber-200 text-amber-800 p-4 rounded-xl font-medium transition" data-tarea="deoldify">
+                        <button class="opcion-btn bg-amber-50 hover:bg-amber-100 border-2 border-amber-200 text-amber-800 p-4 rounded-xl font-medium transition" data-model="deoldify">
                             <span class="text-2xl block mb-2">🎨</span>
                             Colorear
                         </button>
-                        <button class="opcion-btn bg-blue-50 hover:bg-blue-100 border-2 border-blue-200 text-blue-800 p-4 rounded-xl font-medium transition" data-tarea="gfpgan">
+                        <button class="opcion-btn bg-blue-50 hover:bg-blue-100 border-2 border-blue-200 text-blue-800 p-4 rounded-xl font-medium transition" data-model="gfpgan">
                             <span class="text-2xl block mb-2">🔧</span>
                             Restaurar Rostro
                         </button>
-                        <button class="opcion-btn bg-purple-50 hover:bg-purple-100 border-2 border-purple-200 text-purple-800 p-4 rounded-xl font-medium transition" data-tarea="esrgan">
+                        <button class="opcion-btn bg-purple-50 hover:bg-purple-100 border-2 border-purple-200 text-purple-800 p-4 rounded-xl font-medium transition" data-model="esrgan">
                             <span class="text-2xl block mb-2">💎</span>
                             Mejorar y Ampliar
                         </button>
                     </div>
                 </div>
 
-                <!-- ⏳ PROGRESO -->
                 <div id="zonaProgreso" class="hidden mt-8 text-center">
                     <div class="flex flex-col items-center">
                         <div class="loader mb-4"></div>
@@ -119,13 +108,12 @@
                             <div id="barraProgreso" class="bg-gradient-to-r from-indigo-600 to-purple-600 h-3 rounded-full transition-all duration-300" style="width:5%"></div>
                         </div>
                         <p id="porcentaje" class="text-sm text-gray-500">5%</p>
-                        <p class="text-xs text-gray-400 mt-3">⏳ La IA está procesando tu foto. Esto puede tardar de 10 a 40 segundos. Ten paciencia.</p>
+                        <p class="text-xs text-gray-400 mt-3">⏳ Procesando en Hugging Face. Puede tardar de 5 a 30 segundos.</p>
                     </div>
                 </div>
 
-                <!-- ✅ RESULTADO -->
                 <div id="zonaResultado" class="hidden mt-10">
-                    <h3 class="text-lg font-bold text-gray-800 mb-4 text-center">✅ ¡Procesamiento completado!</h3>
+                    <h3 class="text-lg font-bold text-gray-800 mb-4 text-center">✅ ¡Completado!</h3>
                     
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                         <div>
@@ -149,47 +137,33 @@
                 </div>
             </div>
 
-            <!-- ⚠️ INFO -->
             <div class="bg-amber-50 border border-amber-200 rounded-xl p-4 text-center">
                 <p class="text-amber-800 text-sm">
-                    ⚡ <strong>Nota:</strong> Usamos la API de Replicate. Cada procesamiento consume créditos. 
-                    Si algo falla, espera un momento y vuelve a intentarlo.
+                    ⚡ <strong>Tu clave de Hugging Face ya está configurada.</strong> 
+                    Si da error, verifica que tu token sea válido en huggingface.co/settings/tokens
                 </p>
             </div>
         </div>
     </section>
 
-    <!-- 🦶 PIE -->
     <footer class="bg-gray-900 text-gray-400 py-8">
         <div class="max-w-4xl mx-auto px-4 text-center">
-            <p class="text-lg mb-2">📸 ReviveTusFotos — Restauración con Inteligencia Artificial</p>
-            <p class="text-sm">© 2026 · Impulsado por Replicate · DeOldify · GFPGAN · Real-ESRGAN</p>
+            <p class="text-lg mb-2">📸 ReviveTusFotos — Con Hugging Face</p>
+            <p class="text-sm">© 2026 · Modelos: DeOldify · GFPGAN · Real-ESRGAN</p>
         </div>
     </footer>
 
 <script>
-    // 🔑 TU CLAVE DE API DE REPLICATE
-    const API_TOKEN = "r8_HFAK4m8qbEpO6FRk6RvtB8ZS3louo6T";
-    // ✅ YA CON EL PROXY PARA EVITAR EL ERROR DE CORS
-    const API_URL = "https://corsproxy.io/?https://api.replicate.com/v1/predictions";
-
-    // 📦 MODELOS
+    // 🔑 TU TOKEN DE HUGGING FACE
+    const HF_TOKEN = "hf_HFAK4m8qbEpO6FRk6RvtB8ZS3louo6T";
+    
+    // 📦 MODELOS en Hugging Face
     const MODELOS = {
-        deoldify: {
-            version: "jrware/deoldify:25810c652893f3c4ac1b88f1c640b8c9a461210601c139d03c2a748278b6",
-            input: (img) => ({ image: img, render_factor: 35 })
-        },
-        gfpgan: {
-            version: "tencentarc/gfpgan:0fbacf76afb590709827c8229c1d42bccffc63b0b4f6512a0a0e49e6b0c07985",
-            input: (img) => ({ img: img, scale: 2, version: "v1.4" })
-        },
-        esrgan: {
-            version: "xinntao/realesrgan:2d0261c14253c0122d80c2a8e85d7a9121832c0e3d004f5c8c0c46c474f069c1",
-            input: (img) => ({ image: img, scale: 4 })
-        }
+        deoldify: "https://api-inference.huggingface.co/models/valhalla/glide-deoldify",
+        gfpgan: "https://api-inference.huggingface.co/models/radames/GFPGAN",
+        esrgan: "https://api-inference.huggingface.co/models/niravjpanchal/Real-ESRGAN"
     };
 
-    // ========== ELEMENTOS ==========
     const zonaSubida = document.getElementById('zonaSubida');
     const entradaImagen = document.getElementById('entradaImagen');
     const zonaPreview = document.getElementById('zonaPreview');
@@ -205,14 +179,13 @@
     const btnNueva = document.getElementById('btnNueva');
 
     let imagenBase64 = null;
-    let tareaSeleccionada = null;
-    let resultadoUrl = null;
+    let imagenBlob = null;
+    let modeloSeleccionado = null;
+    let resultadoBlobUrl = null;
 
-    // ========== CARGA DE IMAGEN ==========
     zonaSubida.addEventListener('click', () => entradaImagen.click());
     entradaImagen.addEventListener('change', manejarArchivo);
 
-    // Arrastrar y soltar
     zonaSubida.addEventListener('dragover', e => { e.preventDefault(); zonaSubida.classList.add('border-indigo-500', 'bg-indigo-50/50'); });
     zonaSubida.addEventListener('dragleave', () => { zonaSubida.classList.remove('border-indigo-500', 'bg-indigo-50/50'); });
     zonaSubida.addEventListener('drop', e => {
@@ -228,11 +201,12 @@
     }
 
     function procesarArchivo(archivo){
-        if(archivo.size > 10 * 1024 * 1024){
-            alert('⚠️ La imagen es muy grande. Máximo 10MB.');
+        if(archivo.size > 5 * 1024 * 1024){
+            alert('⚠️ La imagen es muy grande. Máximo 5MB.');
             return;
         }
         
+        imagenBlob = archivo;
         const lector = new FileReader();
         lector.onload = function(evt){
             imagenBase64 = evt.target.result;
@@ -244,149 +218,101 @@
         lector.readAsDataURL(archivo);
     }
 
-    // ========== SELECCIONAR TAREA ==========
     document.querySelectorAll('.opcion-btn').forEach(btn => {
         btn.addEventListener('click', async () => {
-            tareaSeleccionada = btn.dataset.tarea;
-            
-            // Resaltar botón seleccionado
+            modeloSeleccionado = btn.dataset.model;
             document.querySelectorAll('.opcion-btn').forEach(b => b.classList.remove('ring-2', 'ring-indigo-500'));
             btn.classList.add('ring-2', 'ring-indigo-500');
-            
             await ejecutarProceso();
         });
     });
 
-    // ========== LLAMADA A LA API ==========
     async function ejecutarProceso(){
-        if(!imagenBase64 || !tareaSeleccionada) return;
+        if(!imagenBlob || !modeloSeleccionado) return;
         
         zonaPreview.classList.add('hidden');
         zonaProgreso.classList.remove('hidden');
         actualizarProgreso(10, "Preparando imagen...");
 
         try {
-            const modelo = MODELOS[tareaSeleccionada];
+            const apiUrl = MODELOS[modeloSeleccionado];
             
-            // Paso 1: Crear la predicción
-            actualizarProgreso(20, "Enviando a la IA...");
+            actualizarProgreso(30, "Enviando a Hugging Face...");
             
-            const respuesta = await fetch(API_URL, {
+            const respuesta = await fetch(apiUrl, {
                 method: 'POST',
                 headers: {
-                    'Authorization': `Token ${API_TOKEN}`,
-                    'Content-Type': 'application/json'
+                    'Authorization': `Bearer ${HF_TOKEN}`,
+                    'Content-Type': 'application/octet-stream'
                 },
-                body: JSON.stringify({
-                    version: modelo.version,
-                    input: modelo.input(imagenBase64)
-                })
+                body: imagenBlob
             });
 
             if(!respuesta.ok){
-                const error = await respuesta.json();
-                throw new Error(error.detail || 'Error al conectar con la API');
+                const textoError = await respuesta.text();
+                throw new Error(`Error ${respuesta.status}: ${textoError}`);
             }
 
-            const prediccion = await respuesta.json();
-            const prediccionId = prediccion.id;
+            actualizarProgreso(70, "Procesando resultado...");
             
-            actualizarProgreso(30, "IA procesando... esto puede tardar unos segundos");
-
-            // Paso 2: Esperar el resultado (polling)
-            let resultado = null;
-            let intentos = 0;
-            const maxIntentos = 60; // 60 segundos máximo
+            const blob = await respuesta.blob();
+            resultadoBlobUrl = URL.createObjectURL(blob);
             
-            while(intentos < maxIntentos){
-                await esperar(1500);
-                intentos++;
-                
-                const estado = await fetch(`${API_URL}/${prediccionId}`, {
-                    headers: { 'Authorization': `Token ${API_TOKEN}` }
-                }).then(r => r.json());
-                
-                const progreso = 30 + Math.floor((intentos / maxIntentos) * 60);
-                actualizarProgreso(progreso, `Procesando... intento ${intentos}/${maxIntentos}`);
-                
-                if(estado.status === 'succeeded'){
-                    resultado = estado.output;
-                    break;
-                }
-                if(estado.status === 'failed'){
-                    throw new Error(estado.error || 'Falló el procesamiento');
-                }
-            }
+            actualizarProgreso(100, "¡Completado!");
             
-            if(!resultado){
-            throw new Error('Tiempo de espera agotado. Intenta de nuevo.');
+            imgOriginal.src = imagenBase64;
+            imgResultado.src = resultadoBlobUrl;
+            
+            await esperar(500);
+            zonaProgreso.classList.add('hidden');
+            zonaResultado.classList.remove('hidden');
+            
+        } catch (error) {
+            console.error(error);
+            alert('❌ Error: ' + error.message + '\n\n💡 Si el error dice "CORS", sube esta página a Netlify o Vercel gratis y funcionará perfecto.');
+            zonaProgreso.classList.add('hidden');
+            zonaPreview.classList.remove('hidden');
         }
-
-        // Paso 3: Mostrar resultado
-        actualizarProgreso(100, "¡Completado!");
-        resultadoUrl = Array.isArray(resultado) ? resultado[0] : resultado;
-        
-        imgOriginal.src = imagenBase64;
-        imgResultado.src = resultadoUrl;
-        
-        await esperar(500);
-        zonaProgreso.classList.add('hidden');
-        zonaResultado.classList.remove('hidden');
-        
-    } catch (error) {
-        alert('❌ Error: ' + error.message);
-        zonaProgreso.classList.add('hidden');
-        zonaPreview.classList.remove('hidden');
     }
-}
 
-function actualizarProgreso(p, m){
-    barraProgreso.style.width = p + '%';
-    porcentaje.textContent = p + '%';
-    textoEstado.textContent = m;
-}
+    function actualizarProgreso(p, m){
+        barraProgreso.style.width = p + '%';
+        porcentaje.textContent = p + '%';
+        textoEstado.textContent = m;
+    }
 
-function esperar(ms){
-    return new Promise(resolve => setTimeout(resolve, ms));
-}
+    function esperar(ms){
+        return new Promise(resolve => setTimeout(resolve, ms));
+    }
 
-// ========== DESCARGAR ==========
-btnDescargar.addEventListener('click', async () => {
-    if(!resultadoUrl) return;
-    
-    try {
-        const respuesta = await fetch(resultadoUrl);
-        const blob = await respuesta.blob();
-        const url = window.URL.createObjectURL(blob);
+    btnDescargar.addEventListener('click', () => {
+        if(!resultadoBlobUrl) return;
         const a = document.createElement('a');
-        a.href = url;
+        a.href = resultadoBlobUrl;
         const fecha = new Date().toISOString().slice(0,10);
-        a.download = `foto-${tareaSeleccionada}-${fecha}.png`;
+        a.download = `foto-${modeloSeleccionado}-${fecha}.png`;
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
-        window.URL.revokeObjectURL(url);
         
         btnDescargar.textContent = '✅ ¡DESCARGADA!';
         setTimeout(() => btnDescargar.textContent = '💾 DESCARGAR FOTO', 3000);
-    } catch {
-        window.open(resultadoUrl, '_blank');
-    }
-});
+    });
 
-// ========== NUEVA FOTO ==========
-btnNueva.addEventListener('click', () => {
-    imagenBase64 = null;
-    tareaSeleccionada = null;
-    resultadoUrl = null;
-    entradaImagen.value = '';
-    zonaSubida.classList.remove('hidden');
-    zonaPreview.classList.add('hidden');
-    zonaProgreso.classList.add('hidden');
-    zonaResultado.classList.add('hidden');
-    barraProgreso.style.width = '5%';
-    porcentaje.textContent = '5%';
-});
+    btnNueva.addEventListener('click', () => {
+        imagenBase64 = null;
+        imagenBlob = null;
+        modeloSeleccionado = null;
+        if(resultadoBlobUrl) URL.revokeObjectURL(resultadoBlobUrl);
+        resultadoBlobUrl = null;
+        entradaImagen.value = '';
+        zonaSubida.classList.remove('hidden');
+        zonaPreview.classList.add('hidden');
+        zonaProgreso.classList.add('hidden');
+        zonaResultado.classList.add('hidden');
+        barraProgreso.style.width = '5%';
+        porcentaje.textContent = '5%';
+    });
 </script>
 </body>
 </html>
