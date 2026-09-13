@@ -20,14 +20,17 @@ html,body{width:100%;min-height:100dvh;background:radial-gradient(ellipse at top
 .fld{display:flex;flex-direction:column;gap:6px;margin-bottom:16px}
 .fld label{font-size:.72rem;font-weight:600;color:#7f9dbf;text-transform:uppercase;letter-spacing:.8px;display:flex;justify-content:space-between;align-items:center}
 .fld label .opt{font-size:.65rem;color:#5c7391;font-weight:400;text-transform:none;letter-spacing:0}
+.fld label .premium-tag{font-size:.62rem;font-weight:700;color:#ffd166;background:rgba(255,209,102,.12);border:1px solid rgba(255,209,102,.4);padding:2px 7px;border-radius:20px;letter-spacing:.4px}
 .fld input,.fld textarea{background:rgba(0,0,0,.4);border:1px solid rgba(0,191,255,.2);border-radius:10px;padding:12px 14px;color:#e6f0ff;font-family:'Inter',sans-serif;font-size:16px;outline:none;width:100%}
 .fld input:focus,.fld textarea:focus{border-color:#00d4ff;box-shadow:0 0 0 3px rgba(0,212,255,.15)}
 .fld textarea{min-height:80px;font-family:'Caveat',cursive;font-size:1.2rem;line-height:1.3;resize:vertical}
 .fld textarea.phrases{font-family:'Dancing Script',cursive;font-size:1.15rem}
 .row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.file-drop{display:flex;align-items:center;justify-content:center;gap:8px;padding:14px;border:1.5px dashed rgba(0,191,255,.4);border-radius:12px;cursor:pointer;transition:all .25s;background:rgba(0,191,255,.04);color:#7f9dbf;font-size:.88rem;text-align:center}
+.file-drop{display:flex;align-items:center;justify-content:center;gap:8px;padding:14px;border:1.5px dashed rgba(0,191,255,.4);border-radius:12px;cursor:pointer;transition:all .25s;background:rgba(0,191,255,.04);color:#7f9dbf;font-size:.88rem;text-align:center;position:relative}
 .file-drop:active{border-color:#00d4ff;background:rgba(0,212,255,.1);color:#a8d8ff}
 .file-drop.has-file{border-style:solid;border-color:#22c55e;background:rgba(34,197,94,.1);color:#86efac}
+.file-drop.premium{border-color:rgba(255,209,102,.5);background:rgba(255,209,102,.06);color:#ffd166}
+.file-drop.premium::after{content:'🔒';position:absolute;top:6px;right:10px;font-size:14px;opacity:.8}
 #photo-list{display:flex;flex-direction:column;gap:10px;margin-top:10px}
 .photo-block{background:rgba(0,0,0,.3);border:1px solid rgba(0,191,255,.2);border-radius:12px;padding:10px;display:flex;gap:10px;align-items:flex-start}
 .thumb{position:relative;width:70px;height:70px;flex-shrink:0;border-radius:9px;overflow:hidden;background:#000;border:1px solid rgba(0,191,255,.35)}
@@ -51,6 +54,7 @@ html,body{width:100%;min-height:100dvh;background:radial-gradient(ellipse at top
 .btn-primary{background:linear-gradient(135deg,#22c55e,#16a34a);color:#fff;box-shadow:0 10px 30px rgba(34,197,94,.4)}
 .btn-ghost{background:linear-gradient(135deg,#00d4ff,#7b2ff7);color:#fff;box-shadow:0 10px 30px rgba(0,212,255,.4)}
 .btn-wa{background:linear-gradient(135deg,#25D366,#128C7E);color:#fff;box-shadow:0 10px 30px rgba(37,211,102,.4)}
+.btn-premium{background:linear-gradient(135deg,#ffd166,#ffa000);color:#1a0e00;box-shadow:0 10px 30px rgba(255,180,40,.4)}
 #qr-area{display:none;margin-top:16px;margin-bottom:8px;padding:18px;background:rgba(0,212,255,.08);border:1px solid rgba(0,212,255,.35);border-radius:14px;text-align:center;scroll-margin-bottom:140px}
 #qr-area.show{display:block;animation:pop .4s}
 @keyframes pop{from{transform:scale(.9);opacity:0}to{transform:scale(1);opacity:1}}
@@ -66,7 +70,7 @@ html,body{width:100%;min-height:100dvh;background:radial-gradient(ellipse at top
 .spinner{width:44px;height:44px;border:4px solid rgba(0,212,255,.2);border-top-color:#00d4ff;border-radius:50%;animation:spin 1s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
 
-/* Barra inferior con espacio seguro */
+/* Barra inferior */
 .fixed-bar{
   position:fixed;bottom:0;left:0;right:0;z-index:900;
   padding:12px 18px calc(12px + env(safe-area-inset-bottom,0));
@@ -76,7 +80,7 @@ html,body{width:100%;min-height:100dvh;background:radial-gradient(ellipse at top
 }
 .fixed-bar .btn{margin:0;flex:1;pointer-events:auto}
 
-/* Botón flotante de compartir la página */
+/* Botón flotante de compartir con logo WhatsApp */
 #share-float{
   position:fixed;
   bottom:calc(96px + env(safe-area-inset-bottom,0));
@@ -89,12 +93,12 @@ html,body{width:100%;min-height:100dvh;background:radial-gradient(ellipse at top
   cursor:pointer;touch-action:manipulation;
   box-shadow:0 10px 30px rgba(37,211,102,.55),0 4px 10px rgba(0,0,0,.5);
   transition:transform .2s ease,box-shadow .2s ease;
-  font-size:24px;
 }
+#share-float svg{width:32px;height:32px;fill:#fff}
 #share-float:active{transform:scale(.92)}
 #share-float:hover{box-shadow:0 12px 40px rgba(37,211,102,.75),0 4px 10px rgba(0,0,0,.5)}
 
-/* Compartir nativo menú */
+/* Menú compartir */
 #share-menu{
   position:fixed;inset:0;z-index:990;
   background:rgba(0,0,0,.7);backdrop-filter:blur(8px);
@@ -136,11 +140,93 @@ html,body{width:100%;min-height:100dvh;background:radial-gradient(ellipse at top
   font-size:18px;flex-shrink:0;
 }
 .share-wa .ico{background:linear-gradient(135deg,#25D366,#128C7E);color:#fff}
+.share-wa .ico svg{width:22px;height:22px;fill:#fff}
 .share-copy .ico{background:linear-gradient(135deg,#00d4ff,#7b2ff7);color:#fff}
 .share-sys .ico{background:rgba(255,255,255,.1);color:#a8d8ff;border:1px solid rgba(0,191,255,.3)}
 .share-opt .txt{flex:1;min-width:0}
 .share-opt .txt b{display:block;font-weight:600;color:#fff;margin-bottom:2px}
 .share-opt .txt span{font-size:.75rem;color:#7f9dbf}
+
+/* Modal Premium */
+#premium-modal{
+  position:fixed;inset:0;z-index:1200;
+  background:rgba(0,0,0,.85);backdrop-filter:blur(10px);
+  display:none;align-items:center;justify-content:center;
+  padding:20px;
+}
+#premium-modal.show{display:flex;animation:fadeIn .3s}
+#premium-box{
+  width:100%;max-width:400px;
+  background:linear-gradient(160deg,#1a1207,#0a0a15);
+  border:2px solid rgba(255,209,102,.5);
+  border-radius:22px;
+  padding:28px 24px;
+  text-align:center;
+  animation:pop .4s cubic-bezier(.2,.9,.3,1.2);
+  box-shadow:0 0 80px rgba(255,180,40,.35),0 0 20px rgba(255,209,102,.2);
+  position:relative;
+  overflow:hidden;
+}
+#premium-box::before{
+  content:'';position:absolute;inset:0;
+  background:radial-gradient(circle at top,rgba(255,209,102,.2),transparent 60%);
+  pointer-events:none;
+}
+#premium-box .crown{
+  font-size:52px;margin-bottom:10px;
+  filter:drop-shadow(0 0 20px rgba(255,209,102,.7));
+  animation:crownFloat 2s ease-in-out infinite;
+  position:relative;
+}
+@keyframes crownFloat{0%,100%{transform:translateY(0) rotate(-4deg)}50%{transform:translateY(-6px) rotate(4deg)}}
+#premium-box h2{
+  font-family:'Pacifico',cursive;
+  font-size:1.6rem;
+  background:linear-gradient(90deg,#ffd166,#ffa000,#ffd166);
+  background-size:200% 100%;
+  -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
+  animation:shimmer 3s infinite;
+  margin-bottom:8px;position:relative;
+}
+@keyframes shimmer{0%{background-position:0% 50%}100%{background-position:200% 50%}}
+#premium-box .subtitle{font-size:.85rem;color:#c9a76a;margin-bottom:20px;position:relative}
+#premium-box .feature{
+  background:rgba(255,209,102,.1);
+  border:1px solid rgba(255,209,102,.3);
+  border-radius:12px;
+  padding:12px 16px;
+  font-size:.88rem;color:#ffe8b3;
+  margin-bottom:18px;text-align:left;position:relative;
+}
+#premium-box .feature b{color:#ffd166}
+#premium-box .price{
+  font-family:'Permanent Marker',cursive;
+  font-size:2rem;color:#ffd166;margin-bottom:6px;
+  text-shadow:0 0 20px rgba(255,209,102,.5);position:relative;
+}
+#premium-box .price-note{font-size:.72rem;color:#8a7a5a;margin-bottom:20px;position:relative}
+#premium-box .btn-upgrade{
+  background:linear-gradient(135deg,#ffd166,#ffa000);
+  color:#1a0e00;font-weight:800;
+  padding:14px;border-radius:12px;
+  border:none;width:100%;cursor:pointer;
+  font-family:inherit;font-size:1rem;
+  box-shadow:0 10px 30px rgba(255,180,40,.5);
+  margin-bottom:10px;position:relative;
+  transition:transform .2s;
+}
+#premium-box .btn-upgrade:active{transform:scale(.97)}
+#premium-box .btn-later{
+  background:transparent;border:1px solid rgba(255,209,102,.3);
+  color:#c9a76a;padding:12px;border-radius:12px;
+  width:100%;cursor:pointer;font-family:inherit;font-size:.85rem;
+  position:relative;
+}
+#premium-box .close-x{
+  position:absolute;top:14px;right:16px;
+  background:transparent;border:none;color:#c9a76a;
+  font-size:24px;cursor:pointer;line-height:1;z-index:2;
+}
 </style>
 </head>
 <body>
@@ -187,7 +273,7 @@ Contigo todo es mejor"></textarea>
     </div>
 
     <div class="fld">
-      <label>Tus fotos (máx. 8)</label>
+      <label>Tus fotos <span class="opt">máx. 8 gratis</span></label>
       <label class="file-drop" for="i-photo" id="file-drop">
         <span id="f-label">📷 Añadir fotos</span>
         <input id="i-photo" type="file" accept="image/*" multiple hidden>
@@ -218,6 +304,29 @@ Contigo todo es mejor"></textarea>
       <div id="palette-grid"></div>
     </div>
 
+    <div class="fld">
+      <label>Música de fondo <span class="premium-tag">PREMIUM</span></label>
+      <label class="file-drop premium" for="i-music" id="music-drop">
+        <span id="m-label">🎵 Subir mi canción</span>
+        <input id="i-music" type="file" accept="audio/*" hidden>
+      </label>
+    </div>
+
+    <div class="fld">
+      <label>Fotos ilimitadas <span class="premium-tag">PREMIUM</span></label>
+      <label class="file-drop premium" for="i-photo-plus">
+        <span>📸 Añadir más de 8 fotos</span>
+        <input id="i-photo-plus" type="file" accept="image/*" multiple hidden>
+      </label>
+    </div>
+
+    <div class="fld">
+      <label>Efectos exclusivos <span class="premium-tag">PREMIUM</span></label>
+      <button type="button" class="file-drop premium" id="premium-fx" style="cursor:pointer;font-family:inherit;color:#ffd166">
+        ✨ Corazón de partículas al iniciar
+      </button>
+    </div>
+
     <div id="qr-area">
       <div class="title">✨ Tu galaxia está lista</div>
       <div id="qr-canvas-wrap"></div>
@@ -237,10 +346,14 @@ Contigo todo es mejor"></textarea>
   <button id="btn-generate" class="btn btn-primary">💾 Descargar</button>
 </div>
 
-<!-- Botón flotante de compartir -->
-<button id="share-float" aria-label="Compartir" title="Compartir">📤</button>
+<!-- Botón flotante con logo WhatsApp -->
+<button id="share-float" aria-label="Compartir">
+  <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
+  </svg>
+</button>
 
-<!-- Menú de compartir -->
+<!-- Menú compartir -->
 <div id="share-menu">
   <div id="share-menu-box">
     <h3>
@@ -250,7 +363,9 @@ Contigo todo es mejor"></textarea>
     <p>Comparte el editor para que otros creen su propia galaxia</p>
 
     <a id="share-wa" class="share-opt share-wa" href="#" target="_blank" rel="noopener">
-      <div class="ico">💬</div>
+      <div class="ico">
+        <svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
+      </div>
       <div class="txt">
         <b>WhatsApp</b>
         <span>Enviar por WhatsApp</span>
@@ -275,6 +390,23 @@ Contigo todo es mejor"></textarea>
   </div>
 </div>
 
+<!-- Modal Premium -->
+<div id="premium-modal">
+  <div id="premium-box">
+    <button class="close-x" id="premium-close">×</button>
+    <div class="crown">👑</div>
+    <h2>Función Premium</h2>
+    <div class="subtitle">Desbloquea todo el potencial</div>
+    <div class="feature" id="premium-feature-text">
+      <b>Esta función</b> te permite llevar tu galaxia al siguiente nivel.
+    </div>
+    <div class="price">$49 MXN</div>
+    <div class="price-note">Pago único · Acceso de por vida</div>
+    <button class="btn-upgrade" id="premium-upgrade">✨ Desbloquear Premium</button>
+    <button class="btn-later" id="premium-later">Quizás después</button>
+  </div>
+</div>
+
 <div id="status"></div>
 <div id="loading"><div class="spinner"></div><div id="loading-text">Creando tu galaxia...</div></div>
 
@@ -295,15 +427,10 @@ var PALETTES = {
 
 var MAX_PHOTOS = 8;
 var state = {
-  name:"Mi amor",
-  fromName:"",
-  startDate:"",
+  name:"Mi amor", fromName:"", startDate:"",
   subtitle:"Una experiencia galáctica te espera",
   message:"Eres mi universo entero ✨\nCada estrella me recuerda a ti.",
-  customPhrases:"",
-  photos:[],
-  palette:"cosmic",
-  photoShape:"square"
+  customPhrases:"", photos:[], palette:"cosmic", photoShape:"square"
 };
 var $ = function(id){ return document.getElementById(id); };
 
@@ -327,6 +454,30 @@ function slugify(s){
   return String(s).toLowerCase()
     .normalize("NFD").replace(/[\u0300-\u036f]/g,"")
     .replace(/[^a-z0-9]+/g,"-").replace(/^-+|-+$/g,"").slice(0,40) || "galaxia";
+}
+
+/* ========== Premium ========== */
+var PREMIUM_MESSAGES = {
+  music: "<b>Música personalizada:</b> sube tu propia canción desde tu celular y que suene mientras tu pareja explora la galaxia.",
+  photos: "<b>Fotos ilimitadas:</b> sin límite de 8 fotos. Sube todos los recuerdos que quieras.",
+  fx: "<b>Efectos exclusivos:</b> corazones de partículas al iniciar, lluvia de estrellas personalizada y más."
+};
+function showPremium(feature){
+  $("premium-feature-text").innerHTML = PREMIUM_MESSAGES[feature] || "Desbloquea funciones exclusivas.";
+  $("premium-modal").classList.add("show");
+}
+function initPremium(){
+  $("premium-close").onclick = function(){ $("premium-modal").classList.remove("show"); };
+  $("premium-later").onclick = function(){ $("premium-modal").classList.remove("show"); };
+  $("premium-modal").onclick = function(e){ if (e.target === $("premium-modal")) $("premium-modal").classList.remove("show"); };
+  $("premium-upgrade").onclick = function(){
+    showStatus("Función disponible próximamente ✨", false);
+  };
+  $("i-music").addEventListener("click", function(e){ e.preventDefault(); showPremium("music"); });
+  $("i-photo-plus").addEventListener("click", function(e){ e.preventDefault(); showPremium("photos"); });
+  $("premium-fx").addEventListener("click", function(e){ e.preventDefault(); showPremium("fx"); });
+  // Los labels premium no deben abrir el file picker
+  $("music-drop").addEventListener("click", function(e){ e.preventDefault(); showPremium("music"); });
 }
 
 /* ========== Fotos ========== */
@@ -358,7 +509,11 @@ async function addPhotos(files){
   var list = Array.from(files).filter(function(f){ return f.type.indexOf("image/") === 0; });
   if (!list.length) return;
   var slots = MAX_PHOTOS - state.photos.length;
-  if (slots <= 0){ showStatus("Máximo " + MAX_PHOTOS + " fotos", false); return; }
+  if (slots <= 0){
+    showPremium("photos");
+    return;
+  }
+  if (list.length > slots) showPremium("photos");
   for (var i = 0; i < list.length && i < slots; i++){
     var file = list[i];
     var url = await new Promise(function(res){
@@ -382,7 +537,6 @@ async function addPhotos(files){
   renderPhotoList();
 }
 
-/* ========== Paletas ========== */
 function renderPalettes(){
   var grid = $("palette-grid"); grid.innerHTML = "";
   Object.keys(PALETTES).forEach(function(key){
@@ -401,7 +555,6 @@ function renderPalettes(){
   });
 }
 
-/* ========== Formas ========== */
 function initShapes(){
   var btns = document.querySelectorAll(".shape-btn");
   btns.forEach(function(b){
@@ -413,7 +566,6 @@ function initShapes(){
   });
 }
 
-/* ========== Leer inputs ========== */
 function readInputs(){
   state.name = $("i-name").value.trim() || "Dedicatoria";
   state.fromName = $("i-from").value.trim();
@@ -423,99 +575,146 @@ function readInputs(){
   state.customPhrases = $("i-phrases").value.trim();
 }
 
-/* ========== Imagen de portada para og:image ========== */
 async function generateCoverImage(){
   var W = 1200, H = 630;
-  var cv = document.createElement("canvas");
-  cv.width = W; cv.height = H;
+  var cv = document.createElement("canvas"); cv.width = W; cv.height = H;
   var ctx = cv.getContext("2d");
-
   var pal = PALETTES[state.palette] || PALETTES.cosmic;
   var grad = ctx.createLinearGradient(0, 0, W, H);
-  grad.addColorStop(0, "#000308");
-  grad.addColorStop(1, "#0b1530");
-  ctx.fillStyle = grad;
-  ctx.fillRect(0, 0, W, H);
-
+  grad.addColorStop(0, "#000308"); grad.addColorStop(1, "#0b1530");
+  ctx.fillStyle = grad; ctx.fillRect(0, 0, W, H);
   for (var i = 0; i < 200; i++){
     var c = pal.colors[Math.floor(Math.random() * pal.colors.length)];
-    ctx.fillStyle = c;
-    ctx.globalAlpha = Math.random() * 0.8 + 0.1;
-    var size = Math.random() * 3 + 1;
+    ctx.fillStyle = c; ctx.globalAlpha = Math.random() * 0.8 + 0.1;
     ctx.beginPath();
-    ctx.arc(Math.random() * W, Math.random() * H, size, 0, Math.PI * 2);
+    ctx.arc(Math.random() * W, Math.random() * H, Math.random() * 3 + 1, 0, Math.PI * 2);
     ctx.fill();
   }
   ctx.globalAlpha = 1;
-
   if (state.photos.length > 0){
     await new Promise(function(resolve){
       var img = new Image();
       img.onload = function(){
-        var size = 360;
-        var cx = W - 260;
-        var cy = H / 2;
+        var size = 360, cx = W - 260, cy = H / 2;
         ctx.save();
         var g = ctx.createRadialGradient(cx, cy, size*0.4, cx, cy, size*0.7);
-        g.addColorStop(0, "rgba(80,200,255,0.5)");
-        g.addColorStop(1, "rgba(80,200,255,0)");
+        g.addColorStop(0, "rgba(80,200,255,0.5)"); g.addColorStop(1, "rgba(80,200,255,0)");
         ctx.fillStyle = g;
-        ctx.beginPath();
-        ctx.arc(cx, cy, size*0.75, 0, Math.PI*2);
-        ctx.fill();
-
-        ctx.beginPath();
-        ctx.arc(cx, cy, size/2, 0, Math.PI*2);
-        ctx.closePath();
-        ctx.clip();
+        ctx.beginPath(); ctx.arc(cx, cy, size*0.75, 0, Math.PI*2); ctx.fill();
+        ctx.beginPath(); ctx.arc(cx, cy, size/2, 0, Math.PI*2); ctx.closePath(); ctx.clip();
         var s = Math.max(size/img.width, size/img.height);
         var dw = img.width * s, dh = img.height * s;
         ctx.drawImage(img, cx - dw/2, cy - dh/2, dw, dh);
         ctx.restore();
-
         ctx.save();
-        ctx.strokeStyle = "rgba(120,220,255,0.95)";
-        ctx.lineWidth = 6;
-        ctx.shadowColor = "rgba(0,200,255,0.9)";
-        ctx.shadowBlur = 20;
-        ctx.beginPath();
-        ctx.arc(cx, cy, size/2, 0, Math.PI*2);
-        ctx.stroke();
+        ctx.strokeStyle = "rgba(120,220,255,0.95)"; ctx.lineWidth = 6;
+        ctx.shadowColor = "rgba(0,200,255,0.9)"; ctx.shadowBlur = 20;
+        ctx.beginPath(); ctx.arc(cx, cy, size/2, 0, Math.PI*2); ctx.stroke();
         ctx.restore();
-
         resolve();
       };
       img.onerror = function(){ resolve(); };
       img.src = state.photos[0].url;
     });
   }
-
-  ctx.textAlign = "left";
-  ctx.textBaseline = "middle";
+  ctx.textAlign = "left"; ctx.textBaseline = "middle";
   ctx.font = "900 78px 'Permanent Marker', cursive, sans-serif";
-  ctx.shadowColor = "rgba(0,191,255,0.7)";
-  ctx.shadowBlur = 30;
+  ctx.shadowColor = "rgba(0,191,255,0.7)"; ctx.shadowBlur = 30;
   ctx.fillStyle = "#ffffff";
-  var title = state.name;
-  if (title.length > 20) title = title.slice(0, 18) + "…";
+  var title = state.name; if (title.length > 20) title = title.slice(0, 18) + "…";
   ctx.fillText(title, 80, H/2 - 40);
-
   ctx.font = "italic 42px 'Caveat', cursive, sans-serif";
-  ctx.fillStyle = "#87CEEB";
-  ctx.shadowBlur = 12;
-  var sub = state.subtitle;
-  if (sub.length > 40) sub = sub.slice(0, 38) + "…";
+  ctx.fillStyle = "#87CEEB"; ctx.shadowBlur = 12;
+  var sub = state.subtitle; if (sub.length > 40) sub = sub.slice(0, 38) + "…";
   ctx.fillText(sub, 80, H/2 + 50);
-
   ctx.font = "600 24px 'Inter', sans-serif";
-  ctx.fillStyle = "rgba(135,206,235,0.6)";
-  ctx.shadowBlur = 0;
+  ctx.fillStyle = "rgba(135,206,235,0.6)"; ctx.shadowBlur = 0;
   ctx.fillText("✨ Una galaxia de amor", 80, H - 60);
-
   return cv.toDataURL("image/jpeg", 0.85);
 }
 
-/* ========== Construir HTML auto-contenido ========== */
+/* ========== Música por defecto (Web Audio API - melodía romántica) ========== */
+function getDefaultMusicScript(){
+  return `
+/* Melodía romántica por defecto usando Web Audio API */
+var audioCtx = null;
+var musicPlaying = false;
+var musicTimer = null;
+var musicStep = 0;
+
+/* Progresión de acordes romántica + melodía tipo caja de música */
+var MELODY = [
+  /* Compases en La menor / Fa / Do / Sol */
+  /* Frecuencias (Hz) de la melodía - notas: A4=440, C5=523.25, E5=659.25, G5=783.99 */
+  659.25, 783.99, 880.00, 783.99, 659.25, 523.25, 587.33, 523.25,
+  440.00, 523.25, 659.25, 587.33, 523.25, 440.00, 493.88, 523.25,
+  523.25, 659.25, 783.99, 659.25, 587.33, 523.25, 493.88, 440.00,
+  392.00, 440.00, 523.25, 440.00, 392.00, 349.23, 392.00, 440.00
+];
+var BASS = [
+  /* Notas de bajo suaves (una por cada 4 notas de melodía) */
+  220.00, 174.61, 261.63, 196.00,
+  220.00, 174.61, 261.63, 196.00
+];
+
+function initAudio(){
+  if (audioCtx) return;
+  try {
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  } catch(e){ return; }
+}
+
+function playNote(freq, time, duration, volume){
+  if (!audioCtx) return;
+  var osc = audioCtx.createOscillator();
+  var gain = audioCtx.createGain();
+  // Sonido tipo caja de música: seno + un poco de triángulo
+  osc.type = 'sine';
+  osc.frequency.value = freq;
+  gain.gain.setValueAtTime(0, time);
+  gain.gain.linearRampToValueAtTime(volume, time + 0.02);
+  gain.gain.exponentialRampToValueAtTime(0.0001, time + duration);
+  osc.connect(gain);
+  gain.connect(audioCtx.destination);
+  osc.start(time);
+  osc.stop(time + duration + 0.05);
+}
+
+function scheduleNextBar(){
+  if (!musicPlaying || !audioCtx) return;
+  var now = audioCtx.currentTime;
+  var beat = 0.45;
+  // Melodía: 8 notas por compás, 4 compases
+  var totalNotes = 32;
+  var startStep = musicStep % totalNotes;
+  // Bajo cada 8 notas (2 compases)
+  var bassStep = Math.floor(musicStep / 8) % BASS.length;
+  playNote(BASS[bassStep], now, beat * 7, 0.06);
+
+  for (var i = 0; i < 8; i++){
+    var idx = (startStep + i) % totalNotes;
+    var freq = MELODY[idx];
+    var vol = 0.10 + Math.random() * 0.03;
+    playNote(freq, now + i * beat, beat * 0.9, vol);
+  }
+  musicStep += 8;
+  musicTimer = setTimeout(scheduleNextBar, beat * 8 * 1000);
+}
+
+function startMusic(){
+  initAudio();
+  if (!audioCtx) return;
+  if (audioCtx.state === 'suspended') audioCtx.resume();
+  musicPlaying = true;
+  scheduleNextBar();
+}
+function stopMusic(){
+  musicPlaying = false;
+  if (musicTimer) { clearTimeout(musicTimer); musicTimer = null; }
+}
+`;
+}
+
 async function buildGalaxyHTML(){
   var name = state.name;
   var fromName = state.fromName;
@@ -526,12 +725,10 @@ async function buildGalaxyHTML(){
   var photoShape = state.photoShape;
   var phrasesJSON = JSON.stringify(LOVE_PHRASES);
   var palettesJSON = JSON.stringify(PALETTES);
-
   var customPhrases = state.customPhrases.split("\n").map(function(l){ return l.trim(); }).filter(function(l){ return l.length > 0; });
   var customJSON = JSON.stringify(customPhrases);
   var startDateJSON = JSON.stringify(state.startDate || null);
   var coverDataURL = await generateCoverImage();
-
   var startSubText = subtitle;
   if (fromName) startSubText = "De " + fromName + " · " + subtitle;
 
@@ -577,6 +774,9 @@ async function buildGalaxyHTML(){
 '#modal-desc.show{display:block}\n' +
 '#modal-msg{font-family:"Caveat",cursive;font-size:clamp(1.35rem,5.5vw,2.4rem);color:#a8d8ff;line-height:1.35;white-space:pre-wrap;overflow-wrap:anywhere}\n' +
 '#modal-close{position:absolute;top:10px;right:10px;width:38px;height:38px;border-radius:50%;background:rgba(0,0,0,.45);border:1px solid rgba(0,191,255,.4);color:#fff;font-size:22px;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1;z-index:10}\n' +
+'#music-btn{position:fixed;top:max(14px,env(safe-area-inset-top,14px));left:14px;z-index:850;width:46px;height:46px;border-radius:50%;border:1px solid rgba(0,191,255,.4);background:rgba(8,15,28,.85);backdrop-filter:blur(10px);color:#a8d8ff;font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;touch-action:manipulation;transition:all .25s}\n' +
+'#music-btn.playing{background:linear-gradient(135deg,#00d4ff,#7b2ff7);color:#fff;border-color:transparent;animation:musicPulse 2s infinite}\n' +
+'@keyframes musicPulse{0%,100%{box-shadow:0 0 0 0 rgba(0,212,255,.6)}50%{box-shadow:0 0 0 14px rgba(0,212,255,0)}}\n' +
 '</style>\n' +
 '</head>\n' +
 '<body>\n' +
@@ -587,6 +787,7 @@ async function buildGalaxyHTML(){
 '  <button id="start-btn" type="button">Toca para iniciar</button>\n' +
 '</div>\n' +
 '<div id="hint">👆 Arrastra · 🤏 Pellizca · Toca las fotos ✨</div>\n' +
+'<button id="music-btn" type="button">🎵</button>\n' +
 '<div id="modal">\n' +
 '  <div id="modal-box">\n' +
 '    <button id="modal-close" type="button">×</button>\n' +
@@ -605,6 +806,7 @@ async function buildGalaxyHTML(){
 '<script>\n' +
 '(function(){\n' +
 '"use strict";\n' +
+getDefaultMusicScript() +
 'var PHOTOS=' + photosJSON + ';\n' +
 'var LOVE_PHRASES=' + phrasesJSON + ';\n' +
 'var PALETTES=' + palettesJSON + ';\n' +
@@ -615,10 +817,9 @@ async function buildGalaxyHTML(){
 'var MESSAGE=' + JSON.stringify(message) + ';\n' +
 'var PHRASE_COUNT=200;\n' +
 'var $=function(id){return document.getElementById(id);};\n' +
-'var el={start:$("start"),startBtn:$("start-btn"),hint:$("hint"),modal:$("modal"),modalImg:$("modal-img"),modalDesc:$("modal-desc"),modalMsg:$("modal-msg"),modalClose:$("modal-close"),days:$("days-together")};\n' +
+'var el={start:$("start"),startBtn:$("start-btn"),hint:$("hint"),modal:$("modal"),modalImg:$("modal-img"),modalDesc:$("modal-desc"),modalMsg:$("modal-msg"),modalClose:$("modal-close"),days:$("days-together"),musicBtn:$("music-btn")};\n' +
 'function easeInOutCubic(x){return x<0.5?4*x*x*x:1-Math.pow(-2*x+2,3)/2;}\n' +
 'function roundedRect(ctx,x,y,w,h,r){ctx.beginPath();ctx.moveTo(x+r,y);ctx.lineTo(x+w-r,y);ctx.quadraticCurveTo(x+w,y,x+w,y+r);ctx.lineTo(x+w,y+h-r);ctx.quadraticCurveTo(x+w,y+h,x+w-r,y+h);ctx.lineTo(x+r,y+h);ctx.quadraticCurveTo(x,y+h,x,y+h-r);ctx.lineTo(x,y+r);ctx.quadraticCurveTo(x,y,x+r,y);ctx.closePath();}\n' +
-'function heartPath(ctx,cx,cy,size){var s=size/16;ctx.beginPath();ctx.moveTo(cx,cy+5*s);ctx.bezierCurveTo(cx-8*s,cy-2*s,cx-10*s,cy-10*s,cx,cy-7*s);ctx.bezierCurveTo(cx+10*s,cy-10*s,cx+8*s,cy-2*s,cx,cy+5*s);ctx.closePath();}\n' +
 'function clipShape(ctx,cx,cy,size){ctx.beginPath();if(PHOTO_SHAPE==="circle"){ctx.arc(cx,cy,size/2,0,Math.PI*2);}else if(PHOTO_SHAPE==="heart"){var s=size/16;ctx.moveTo(cx,cy+5*s);ctx.bezierCurveTo(cx-8*s,cy-2*s,cx-10*s,cy-10*s,cx,cy-7*s);ctx.bezierCurveTo(cx+10*s,cy-10*s,cx+8*s,cy-2*s,cx,cy+5*s);ctx.closePath();}else{var r=size*0.08;ctx.moveTo(cx-size/2+r,cy-size/2);ctx.lineTo(cx+size/2-r,cy-size/2);ctx.quadraticCurveTo(cx+size/2,cy-size/2,cx+size/2,cy-size/2+r);ctx.lineTo(cx+size/2,cy+size/2-r);ctx.quadraticCurveTo(cx+size/2,cy+size/2,cx+size/2-r,cy+size/2);ctx.lineTo(cx-size/2+r,cy+size/2);ctx.quadraticCurveTo(cx-size/2,cy+size/2,cx-size/2,cy+size/2-r);ctx.lineTo(cx-size/2,cy-size/2+r);ctx.quadraticCurveTo(cx-size/2,cy-size/2,cx-size/2+r,cy-size/2);ctx.closePath();}ctx.clip();}\n' +
 'function strokeShape(ctx,cx,cy,size){ctx.beginPath();if(PHOTO_SHAPE==="circle"){ctx.arc(cx,cy,size/2,0,Math.PI*2);}else if(PHOTO_SHAPE==="heart"){var s=size/16;ctx.moveTo(cx,cy+5*s);ctx.bezierCurveTo(cx-8*s,cy-2*s,cx-10*s,cy-10*s,cx,cy-7*s);ctx.bezierCurveTo(cx+10*s,cy-10*s,cx+8*s,cy-2*s,cx,cy+5*s);ctx.closePath();}else{var r=size*0.08;ctx.moveTo(cx-size/2+r,cy-size/2);ctx.lineTo(cx+size/2-r,cy-size/2);ctx.quadraticCurveTo(cx+size/2,cy-size/2,cx+size/2,cy-size/2+r);ctx.lineTo(cx+size/2,cy+size/2-r);ctx.quadraticCurveTo(cx+size/2,cy+size/2,cx+size/2-r,cy+size/2);ctx.lineTo(cx-size/2+r,cy+size/2);ctx.quadraticCurveTo(cx-size/2,cy+size/2,cx-size/2,cy+size/2-r);ctx.lineTo(cx-size/2,cy-size/2+r);ctx.quadraticCurveTo(cx-size/2,cy-size/2,cx-size/2+r,cy-size/2);ctx.closePath();}ctx.stroke();}\n' +
 'var isMobile=/Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent)||(window.matchMedia&&matchMedia("(pointer:coarse)").matches)||innerWidth<720;\n' +
@@ -1024,6 +1225,8 @@ async function buildGalaxyHTML(){
 'function start(){\n' +
 '  if(started)return;started=true;\n' +
 '  el.start.classList.add("hidden");el.hint.classList.add("show");isStarted=true;\n' +
+'  /* Iniciar música romántica por defecto */\n' +
+'  try { startMusic(); el.musicBtn.classList.add("playing"); } catch(e){}\n' +
 '  setTimeout(function(){\n' +
 '    if(PHOTOS.length){\n' +
 '      setTimeout(function(){\n' +
@@ -1043,6 +1246,10 @@ async function buildGalaxyHTML(){
 '  e.preventDefault();start();\n' +
 '});\n' +
 'el.startBtn.addEventListener("click",function(e){e.preventDefault();start();});\n' +
+'el.musicBtn.addEventListener("click",function(){\n' +
+'  if(musicPlaying){stopMusic();el.musicBtn.classList.remove("playing");}\n' +
+'  else{startMusic();el.musicBtn.classList.add("playing");}\n' +
+'});\n' +
 'function closeModal(){el.modal.classList.remove("show");if(isStarted)zoomOutFn();}\n' +
 'el.modalClose.addEventListener("click",function(e){e.stopPropagation();closeModal();});\n' +
 'el.modal.addEventListener("click",function(e){if(e.target===el.modal)closeModal();});\n' +
@@ -1097,8 +1304,6 @@ async function download(){
 
     showStatus("¡Descargado! (" + sizeKB + " KB)");
     renderQR(fname, sizeKB);
-
-    // Scroll automático al fondo para ver el QR sin que lo tape la barra
     setTimeout(function(){
       window.scrollTo({ top: document.body.scrollHeight, behavior: "smooth" });
     }, 150);
@@ -1110,122 +1315,74 @@ async function download(){
   }
 }
 
-/* ========== QR ========== */
 function renderQR(fname, sizeKB){
-  var wrap = $("qr-canvas-wrap");
-  wrap.innerHTML = "";
-  var area = $("qr-area");
-  area.classList.add("show");
-
+  var wrap = $("qr-canvas-wrap"); wrap.innerHTML = "";
+  var area = $("qr-area"); area.classList.add("show");
   var qrContent = "MI_GALAXIA|" + fname + "|" + state.name + "|" + state.palette + "|" + (state.photos.length) + "fotos";
-
   if (typeof QRCode === "undefined"){
     wrap.innerHTML = '<div style="color:#ef4444;font-size:.8rem">No se pudo cargar el QR</div>';
     return;
   }
   var canvas = document.createElement("canvas");
   wrap.appendChild(canvas);
-  QRCode.toCanvas(canvas, qrContent, {
-    width: 200,
-    margin: 1,
-    color: { dark: "#000308", light: "#ffffff" }
-  }, function(err){
+  QRCode.toCanvas(canvas, qrContent, { width: 200, margin: 1, color: { dark: "#000308", light: "#ffffff" } }, function(err){
     if (err) console.error(err);
   });
-
   var info = document.createElement("div");
-  info.style.marginTop = "10px";
-  info.style.fontSize = ".75rem";
-  info.style.color = "#7c93b0";
+  info.style.marginTop = "10px"; info.style.fontSize = ".75rem"; info.style.color = "#7c93b0";
   info.innerHTML = '<b style="color:#a8d8ff">' + escapeHtml(fname) + '</b><br>' + sizeKB + ' KB · ' + state.photos.length + ' foto' + (state.photos.length>1?'s':'');
   wrap.appendChild(info);
-
   var waMsg = encodeURIComponent("💫 Te hice una galaxia de amor ✨\nÁbrela abriendo este archivo: " + fname);
   var wa = document.createElement("button");
   wa.className = "btn btn-wa";
   wa.textContent = "💬 Compartir por WhatsApp";
-  wa.style.marginTop = "12px";
-  wa.style.marginBottom = "0";
+  wa.style.marginTop = "12px"; wa.style.marginBottom = "0";
   wa.onclick = function(){ window.open("https://wa.me/?text=" + waMsg, "_blank"); };
   wrap.appendChild(wa);
 }
 
-/* ========== Compartir la página (editor) ========== */
 function initShare(){
-  var shareBtn = document.getElementById("share-float");
-  var menu = document.getElementById("share-menu");
-  var closeBtn = document.getElementById("share-close");
-  var wa = document.getElementById("share-wa");
-  var copyBtn = document.getElementById("share-copy");
-  var sysBtn = document.getElementById("share-sys");
-
+  var shareBtn = $("share-float"), menu = $("share-menu"), closeBtn = $("share-close");
+  var wa = $("share-wa"), copyBtn = $("share-copy"), sysBtn = $("share-sys");
   if (!shareBtn || !menu) return;
-
   var pageURL = window.location.href.split("#")[0].split("?")[0];
   var pageTitle = "Crea tu galaxia de amor ✨";
   var pageText = "Mira este editor para crear una galaxia personalizada con tus fotos y regalarla 💫\n" + pageURL;
-
-  function openMenu(){
-    wa.href = "https://wa.me/?text=" + encodeURIComponent(pageText);
-    menu.classList.add("show");
-  }
+  function openMenu(){ wa.href = "https://wa.me/?text=" + encodeURIComponent(pageText); menu.classList.add("show"); }
   function closeMenu(){ menu.classList.remove("show"); }
-
   shareBtn.addEventListener("click", openMenu);
   closeBtn.addEventListener("click", closeMenu);
   menu.addEventListener("click", function(e){ if (e.target === menu) closeMenu(); });
-
   copyBtn.addEventListener("click", async function(){
-    try {
-      await navigator.clipboard.writeText(pageURL);
-      showStatus("Enlace copiado ✓");
-      setTimeout(closeMenu, 400);
-    } catch(e){
-      var ta = document.createElement("textarea");
-      ta.value = pageURL;
-      document.body.appendChild(ta);
-      ta.select();
-      try { document.execCommand("copy"); showStatus("Enlace copiado ✓"); }
-      catch(_){ showStatus("No se pudo copiar", false); }
-      ta.remove();
-      setTimeout(closeMenu, 400);
+    try { await navigator.clipboard.writeText(pageURL); showStatus("Enlace copiado ✓"); setTimeout(closeMenu, 400); }
+    catch(e){
+      var ta = document.createElement("textarea"); ta.value = pageURL; document.body.appendChild(ta); ta.select();
+      try { document.execCommand("copy"); showStatus("Enlace copiado ✓"); } catch(_){ showStatus("No se pudo copiar", false); }
+      ta.remove(); setTimeout(closeMenu, 400);
     }
   });
-
   sysBtn.addEventListener("click", async function(){
     if (navigator.share){
-      try {
-        await navigator.share({
-          title: pageTitle,
-          text: "Crea tu galaxia de amor 💫",
-          url: pageURL
-        });
-        closeMenu();
-      } catch(e){}
-    } else {
-      showStatus("Tu navegador no soporta compartir nativo", false);
-    }
+      try { await navigator.share({ title: pageTitle, text: "Crea tu galaxia de amor 💫", url: pageURL }); closeMenu(); } catch(e){}
+    } else { showStatus("Tu navegador no soporta compartir nativo", false); }
   });
 }
 
-/* ========== Init ========== */
 function initEditor(){
   $("i-photo").addEventListener("change", function(e){ addPhotos(e.target.files); e.target.value = ""; });
   $("btn-view").addEventListener("click", visualize);
   $("btn-generate").addEventListener("click", download);
-
   ["i-name","i-from","i-date","i-sub","i-msg","i-phrases"].forEach(function(id){
     $(id).addEventListener("input", readInputs);
   });
-
   var drop = $("file-drop");
   ["dragenter","dragover"].forEach(function(ev){ drop.addEventListener(ev, function(e){ e.preventDefault(); drop.style.borderColor = "#00d4ff"; }); });
   ["dragleave","drop"].forEach(function(ev){ drop.addEventListener(ev, function(e){ e.preventDefault(); drop.style.borderColor = ""; }); });
   drop.addEventListener("drop", function(e){ e.preventDefault(); if (e.dataTransfer.files) addPhotos(e.dataTransfer.files); });
-
   renderPalettes();
   initShapes();
   renderPhotoList();
+  initPremium();
 }
 
 initEditor();
