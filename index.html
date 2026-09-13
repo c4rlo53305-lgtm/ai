@@ -11,7 +11,7 @@
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{width:100%;min-height:100dvh;background:radial-gradient(ellipse at top,#0b1530 0%,#000308 70%);font-family:'Inter',sans-serif;color:#fff;overflow-x:hidden}
-#editor{position:relative;z-index:10;max-width:560px;margin:0 auto;padding:24px 18px 140px}
+#editor{position:relative;z-index:10;max-width:560px;margin:0 auto;padding:24px 18px 180px}
 .hero{text-align:center;margin-bottom:22px}
 .hero h1{font-family:'Permanent Marker',cursive;font-size:clamp(1.8rem,7vw,2.6rem);line-height:1.05;background:linear-gradient(90deg,#00d4ff,#7b2ff7,#f107a3,#ff6b35,#00d4ff);background-size:300% 300%;-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;animation:flow 5s infinite;letter-spacing:1px;filter:drop-shadow(0 0 30px rgba(0,191,255,.4))}
 @keyframes flow{0%,100%{background-position:0% 50%}50%{background-position:100% 50%}}
@@ -51,22 +51,96 @@ html,body{width:100%;min-height:100dvh;background:radial-gradient(ellipse at top
 .btn-primary{background:linear-gradient(135deg,#22c55e,#16a34a);color:#fff;box-shadow:0 10px 30px rgba(34,197,94,.4)}
 .btn-ghost{background:linear-gradient(135deg,#00d4ff,#7b2ff7);color:#fff;box-shadow:0 10px 30px rgba(0,212,255,.4)}
 .btn-wa{background:linear-gradient(135deg,#25D366,#128C7E);color:#fff;box-shadow:0 10px 30px rgba(37,211,102,.4)}
-#qr-area{display:none;margin-top:16px;padding:18px;background:rgba(0,212,255,.08);border:1px solid rgba(0,212,255,.35);border-radius:14px;text-align:center}
+#qr-area{display:none;margin-top:16px;margin-bottom:8px;padding:18px;background:rgba(0,212,255,.08);border:1px solid rgba(0,212,255,.35);border-radius:14px;text-align:center;scroll-margin-bottom:140px}
 #qr-area.show{display:block;animation:pop .4s}
 @keyframes pop{from{transform:scale(.9);opacity:0}to{transform:scale(1);opacity:1}}
 #qr-area .title{font-size:.75rem;color:#7f9dbf;text-transform:uppercase;letter-spacing:.8px;margin-bottom:12px;font-weight:600}
 #qr-area .sub{font-size:.75rem;color:#7c93b0;margin-top:10px;line-height:1.5}
-#qr-area canvas,#qr-area img{border-radius:12px;background:#fff;padding:8px;display:inline-block;max-width:220px}
+#qr-canvas-wrap canvas,#qr-canvas-wrap img{border-radius:12px;background:#fff;padding:8px;display:inline-block;max-width:220px}
 .info{font-size:.72rem;color:#7f9dbf;text-align:center;margin-top:12px;line-height:1.5;background:rgba(0,191,255,.06);padding:10px;border-radius:10px}
-#status{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(120%);background:linear-gradient(135deg,#22c55e,#16a34a);color:#fff;padding:13px 24px;border-radius:12px;font-size:.9rem;font-weight:600;z-index:1000;transition:transform .35s;pointer-events:none;max-width:90vw;text-align:center;box-shadow:0 12px 34px rgba(0,0,0,.5)}
+#status{position:fixed;bottom:calc(90px + env(safe-area-inset-bottom,0));left:50%;transform:translateX(-50%) translateY(120%);background:linear-gradient(135deg,#22c55e,#16a34a);color:#fff;padding:13px 24px;border-radius:12px;font-size:.9rem;font-weight:600;z-index:1000;transition:transform .35s;pointer-events:none;max-width:90vw;text-align:center;box-shadow:0 12px 34px rgba(0,0,0,.5)}
 #status.show{transform:translateX(-50%) translateY(0)}
 #status.err{background:linear-gradient(135deg,#ef4444,#dc2626)}
 #loading{position:fixed;inset:0;background:rgba(0,0,0,.78);backdrop-filter:blur(8px);display:none;align-items:center;justify-content:center;z-index:900;flex-direction:column;gap:14px;color:#87CEEB}
 #loading.show{display:flex}
 .spinner{width:44px;height:44px;border:4px solid rgba(0,212,255,.2);border-top-color:#00d4ff;border-radius:50%;animation:spin 1s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
-.fixed-bar{position:fixed;bottom:0;left:0;right:0;z-index:900;padding:12px 18px calc(12px + env(safe-area-inset-bottom,0));background:linear-gradient(180deg,rgba(0,3,8,0),rgba(0,3,8,.95) 30%);display:flex;gap:10px;max-width:560px;margin:0 auto}
-.fixed-bar .btn{margin:0;flex:1}
+
+/* Barra inferior con espacio seguro */
+.fixed-bar{
+  position:fixed;bottom:0;left:0;right:0;z-index:900;
+  padding:12px 18px calc(12px + env(safe-area-inset-bottom,0));
+  background:linear-gradient(180deg,rgba(0,3,8,0),rgba(0,3,8,.96) 35%);
+  display:flex;gap:10px;max-width:560px;margin:0 auto;
+  pointer-events:none;
+}
+.fixed-bar .btn{margin:0;flex:1;pointer-events:auto}
+
+/* Botón flotante de compartir la página */
+#share-float{
+  position:fixed;
+  bottom:calc(96px + env(safe-area-inset-bottom,0));
+  right:16px;
+  z-index:950;
+  width:54px;height:54px;border-radius:50%;
+  background:linear-gradient(135deg,#25D366,#128C7E);
+  color:#fff;border:none;
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;touch-action:manipulation;
+  box-shadow:0 10px 30px rgba(37,211,102,.55),0 4px 10px rgba(0,0,0,.5);
+  transition:transform .2s ease,box-shadow .2s ease;
+  font-size:24px;
+}
+#share-float:active{transform:scale(.92)}
+#share-float:hover{box-shadow:0 12px 40px rgba(37,211,102,.75),0 4px 10px rgba(0,0,0,.5)}
+
+/* Compartir nativo menú */
+#share-menu{
+  position:fixed;inset:0;z-index:990;
+  background:rgba(0,0,0,.7);backdrop-filter:blur(8px);
+  display:none;align-items:flex-end;justify-content:center;
+  padding:20px;
+}
+#share-menu.show{display:flex;animation:fadeIn .25s}
+#share-menu-box{
+  width:100%;max-width:440px;
+  background:linear-gradient(160deg,rgba(13,29,49,.98),rgba(12,13,19,.98));
+  border:1px solid rgba(0,191,255,.35);
+  border-radius:20px;
+  padding:22px 20px calc(20px + env(safe-area-inset-bottom,0));
+  animation:slideUp .3s cubic-bezier(.2,.9,.3,1.1);
+  box-shadow:0 0 60px rgba(0,191,255,.35);
+}
+@keyframes slideUp{from{transform:translateY(30px);opacity:0}to{transform:translateY(0);opacity:1}}
+#share-menu h3{
+  font-size:1rem;font-weight:700;margin-bottom:6px;color:#fff;
+  display:flex;justify-content:space-between;align-items:center;
+}
+#share-menu h3 button{
+  background:transparent;border:none;color:#7f9dbf;font-size:22px;
+  cursor:pointer;padding:0 4px;line-height:1;
+}
+#share-menu p{font-size:.78rem;color:#7f9dbf;margin-bottom:16px}
+.share-opt{
+  display:flex;align-items:center;gap:12px;
+  padding:13px 14px;border-radius:12px;
+  background:rgba(0,0,0,.35);border:1px solid rgba(0,191,255,.15);
+  cursor:pointer;transition:all .2s;margin-bottom:9px;
+  color:#e6f0ff;font-size:.9rem;font-weight:500;
+  text-decoration:none;font-family:inherit;width:100%;text-align:left;
+}
+.share-opt:hover{background:rgba(0,212,255,.12);border-color:rgba(0,212,255,.5)}
+.share-opt .ico{
+  width:36px;height:36px;border-radius:10px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:18px;flex-shrink:0;
+}
+.share-wa .ico{background:linear-gradient(135deg,#25D366,#128C7E);color:#fff}
+.share-copy .ico{background:linear-gradient(135deg,#00d4ff,#7b2ff7);color:#fff}
+.share-sys .ico{background:rgba(255,255,255,.1);color:#a8d8ff;border:1px solid rgba(0,191,255,.3)}
+.share-opt .txt{flex:1;min-width:0}
+.share-opt .txt b{display:block;font-weight:600;color:#fff;margin-bottom:2px}
+.share-opt .txt span{font-size:.75rem;color:#7f9dbf}
 </style>
 </head>
 <body>
@@ -147,7 +221,7 @@ Contigo todo es mejor"></textarea>
     <div id="qr-area">
       <div class="title">✨ Tu galaxia está lista</div>
       <div id="qr-canvas-wrap"></div>
-      <div class="sub">Escanea el código o comparte el archivo descargado.<br>El QR lleva a la vista previa de tu galaxia.</div>
+      <div class="sub">Escanea el código o comparte el archivo descargado.<br>El QR lleva la firma de tu galaxia.</div>
     </div>
 
     <div class="info">
@@ -163,10 +237,47 @@ Contigo todo es mejor"></textarea>
   <button id="btn-generate" class="btn btn-primary">💾 Descargar</button>
 </div>
 
+<!-- Botón flotante de compartir -->
+<button id="share-float" aria-label="Compartir" title="Compartir">📤</button>
+
+<!-- Menú de compartir -->
+<div id="share-menu">
+  <div id="share-menu-box">
+    <h3>
+      Compartir esta página
+      <button id="share-close" aria-label="Cerrar">×</button>
+    </h3>
+    <p>Comparte el editor para que otros creen su propia galaxia</p>
+
+    <a id="share-wa" class="share-opt share-wa" href="#" target="_blank" rel="noopener">
+      <div class="ico">💬</div>
+      <div class="txt">
+        <b>WhatsApp</b>
+        <span>Enviar por WhatsApp</span>
+      </div>
+    </a>
+
+    <button id="share-copy" class="share-opt share-copy" type="button">
+      <div class="ico">🔗</div>
+      <div class="txt">
+        <b>Copiar enlace</b>
+        <span>Copiar el link del editor</span>
+      </div>
+    </button>
+
+    <button id="share-sys" class="share-opt share-sys" type="button">
+      <div class="ico">📱</div>
+      <div class="txt">
+        <b>Más opciones</b>
+        <span>Usar el compartir del sistema</span>
+      </div>
+    </button>
+  </div>
+</div>
+
 <div id="status"></div>
 <div id="loading"><div class="spinner"></div><div id="loading-text">Creando tu galaxia...</div></div>
 
-<!-- Generador de QR -->
 <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
 
 <script>
@@ -312,15 +423,13 @@ function readInputs(){
   state.customPhrases = $("i-phrases").value.trim();
 }
 
-/* ========== Generar imagen de portada para og:image ========== */
+/* ========== Imagen de portada para og:image ========== */
 async function generateCoverImage(){
-  // Canvas 1200x630 (estándar og:image)
   var W = 1200, H = 630;
   var cv = document.createElement("canvas");
   cv.width = W; cv.height = H;
   var ctx = cv.getContext("2d");
 
-  // Fondo cósmico con la paleta
   var pal = PALETTES[state.palette] || PALETTES.cosmic;
   var grad = ctx.createLinearGradient(0, 0, W, H);
   grad.addColorStop(0, "#000308");
@@ -328,7 +437,6 @@ async function generateCoverImage(){
   ctx.fillStyle = grad;
   ctx.fillRect(0, 0, W, H);
 
-  // Estrellas de la paleta
   for (var i = 0; i < 200; i++){
     var c = pal.colors[Math.floor(Math.random() * pal.colors.length)];
     ctx.fillStyle = c;
@@ -340,7 +448,6 @@ async function generateCoverImage(){
   }
   ctx.globalAlpha = 1;
 
-  // Si hay primera foto, la dibujamos a la derecha en círculo
   if (state.photos.length > 0){
     await new Promise(function(resolve){
       var img = new Image();
@@ -349,7 +456,6 @@ async function generateCoverImage(){
         var cx = W - 260;
         var cy = H / 2;
         ctx.save();
-        // Marco circular con glow
         var g = ctx.createRadialGradient(cx, cy, size*0.4, cx, cy, size*0.7);
         g.addColorStop(0, "rgba(80,200,255,0.5)");
         g.addColorStop(1, "rgba(80,200,255,0)");
@@ -362,13 +468,11 @@ async function generateCoverImage(){
         ctx.arc(cx, cy, size/2, 0, Math.PI*2);
         ctx.closePath();
         ctx.clip();
-        // Cover
         var s = Math.max(size/img.width, size/img.height);
         var dw = img.width * s, dh = img.height * s;
         ctx.drawImage(img, cx - dw/2, cy - dh/2, dw, dh);
         ctx.restore();
 
-        // Borde cian
         ctx.save();
         ctx.strokeStyle = "rgba(120,220,255,0.95)";
         ctx.lineWidth = 6;
@@ -386,7 +490,6 @@ async function generateCoverImage(){
     });
   }
 
-  // Título
   ctx.textAlign = "left";
   ctx.textBaseline = "middle";
   ctx.font = "900 78px 'Permanent Marker', cursive, sans-serif";
@@ -397,7 +500,6 @@ async function generateCoverImage(){
   if (title.length > 20) title = title.slice(0, 18) + "…";
   ctx.fillText(title, 80, H/2 - 40);
 
-  // Subtítulo
   ctx.font = "italic 42px 'Caveat', cursive, sans-serif";
   ctx.fillStyle = "#87CEEB";
   ctx.shadowBlur = 12;
@@ -405,7 +507,6 @@ async function generateCoverImage(){
   if (sub.length > 40) sub = sub.slice(0, 38) + "…";
   ctx.fillText(sub, 80, H/2 + 50);
 
-  // Pie pequeño
   ctx.font = "600 24px 'Inter', sans-serif";
   ctx.fillStyle = "rgba(135,206,235,0.6)";
   ctx.shadowBlur = 0;
@@ -426,14 +527,9 @@ async function buildGalaxyHTML(){
   var phrasesJSON = JSON.stringify(LOVE_PHRASES);
   var palettesJSON = JSON.stringify(PALETTES);
 
-  // Frases personalizadas
   var customPhrases = state.customPhrases.split("\n").map(function(l){ return l.trim(); }).filter(function(l){ return l.length > 0; });
   var customJSON = JSON.stringify(customPhrases);
-
-  // Fecha juntos
   var startDateJSON = JSON.stringify(state.startDate || null);
-
-  // og:image
   var coverDataURL = await generateCoverImage();
 
   var startSubText = subtitle;
@@ -481,9 +577,6 @@ async function buildGalaxyHTML(){
 '#modal-desc.show{display:block}\n' +
 '#modal-msg{font-family:"Caveat",cursive;font-size:clamp(1.35rem,5.5vw,2.4rem);color:#a8d8ff;line-height:1.35;white-space:pre-wrap;overflow-wrap:anywhere}\n' +
 '#modal-close{position:absolute;top:10px;right:10px;width:38px;height:38px;border-radius:50%;background:rgba(0,0,0,.45);border:1px solid rgba(0,191,255,.4);color:#fff;font-size:22px;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1;z-index:10}\n' +
-'#music-btn{position:fixed;top:max(14px,env(safe-area-inset-top,14px));left:14px;z-index:850;width:46px;height:46px;border-radius:50%;border:1px solid rgba(0,191,255,.4);background:rgba(8,15,28,.85);backdrop-filter:blur(10px);color:#a8d8ff;font-size:20px;cursor:pointer;display:none;align-items:center;justify-content:center;touch-action:manipulation}\n' +
-'#music-btn.show{display:flex}\n' +
-'#music-btn.playing{background:linear-gradient(135deg,#00d4ff,#7b2ff7);color:#fff;border-color:transparent}\n' +
 '</style>\n' +
 '</head>\n' +
 '<body>\n' +
@@ -702,24 +795,19 @@ async function buildGalaxyHTML(){
 '    img.onload=function(){\n' +
 '      var S=512,cv=document.createElement("canvas");cv.width=cv.height=S;\n' +
 '      var ctx=cv.getContext("2d");\n' +
-'      // Halo\n' +
 '      var glow=ctx.createRadialGradient(S/2,S/2,S*0.32,S/2,S/2,S*0.52);\n' +
 '      glow.addColorStop(0,"rgba(80,200,255,0.42)");glow.addColorStop(1,"rgba(80,200,255,0)");\n' +
 '      ctx.fillStyle=glow;ctx.fillRect(0,0,S,S);\n' +
 '      var pad=40,inner=S-pad*2,cx=S/2,cy=S/2;\n' +
-'      // Fondo interior\n' +
 '      var bg=ctx.createLinearGradient(pad,pad,S-pad,S-pad);\n' +
 '      bg.addColorStop(0,"#0a1525");bg.addColorStop(1,"#050a15");\n' +
 '      ctx.save();clipShape(ctx,cx,cy,inner);ctx.fillStyle=bg;ctx.fillRect(pad,pad,inner,inner);\n' +
-'      // Imagen\n' +
 '      var scale=Math.max(inner/img.width,inner/img.height);\n' +
 '      var dw=img.width*scale,dh=img.height*scale;\n' +
 '      ctx.drawImage(img,cx-dw/2,cy-dh/2,dw,dh);\n' +
 '      ctx.restore();\n' +
-'      // Borde\n' +
 '      ctx.save();ctx.strokeStyle="rgba(120,220,255,0.9)";ctx.lineWidth=4;ctx.shadowColor="rgba(0,200,255,0.8)";ctx.shadowBlur=12;\n' +
 '      strokeShape(ctx,cx,cy,inner);ctx.restore();\n' +
-'      // Borde interior\n' +
 '      ctx.save();ctx.strokeStyle="rgba(255,255,255,0.3)";ctx.lineWidth=1.5;\n' +
 '      strokeShape(ctx,cx,cy,inner-12);ctx.restore();\n' +
 '      var tex=new THREE.CanvasTexture(cv);\n' +
@@ -795,7 +883,6 @@ async function buildGalaxyHTML(){
 '    var r=makePhraseTex(text,color,i,true);\n' +
 '    var mat=new THREE.SpriteMaterial({map:r.tex,transparent:true,depthWrite:false,blending:THREE.AdditiveBlending,opacity:0.95});\n' +
 '    var sprite=new THREE.Sprite(mat);\n' +
-'    // Distribuidas en círculo cerca del centro, en planos distintos\n' +
 '    var golden=Math.PI*(3-Math.sqrt(5));\n' +
 '    var angle=i*golden+0.3;\n' +
 '    var radius=2.5+Math.random()*2.5;\n' +
@@ -978,7 +1065,6 @@ async function visualize(){
     var w = window.open(url, "_blank");
     if (!w) showStatus("Permite ventanas emergentes para visualizar", false);
     else showStatus("Abriendo vista previa...");
-    // No revocamos la URL inmediatamente para que el navegador la cargue
     setTimeout(function(){ URL.revokeObjectURL(url); }, 60000);
   } catch(err){
     console.error(err);
@@ -1010,9 +1096,12 @@ async function download(){
     setTimeout(function(){ URL.revokeObjectURL(url); }, 5000);
 
     showStatus("¡Descargado! (" + sizeKB + " KB)");
-
-    // Generar QR con el nombre del archivo
     renderQR(fname, sizeKB);
+
+    // Scroll automático al fondo para ver el QR sin que lo tape la barra
+    setTimeout(function(){
+      window.scrollTo({ top: document.body.scrollHeight, behavior: "smooth" });
+    }, 150);
   } catch(err){
     console.error(err);
     showStatus("Error: " + err.message, false);
@@ -1028,11 +1117,6 @@ function renderQR(fname, sizeKB){
   var area = $("qr-area");
   area.classList.add("show");
 
-  // Contenido del QR: nombre del archivo + instrucción
-  // (No es un link porque el archivo no está en un servidor, es local)
-  var qrData = "galaxia-de-amor:" + state.name + ":" + Date.now();
-  // Usamos el nombre del archivo como texto, y generamos QR del nombre
-  // pero mejor: generamos QR del JSON de identificación (útil para verificar)
   var qrContent = "MI_GALAXIA|" + fname + "|" + state.name + "|" + state.palette + "|" + (state.photos.length) + "fotos";
 
   if (typeof QRCode === "undefined"){
@@ -1049,7 +1133,6 @@ function renderQR(fname, sizeKB){
     if (err) console.error(err);
   });
 
-  // Info bajo el QR
   var info = document.createElement("div");
   info.style.marginTop = "10px";
   info.style.fontSize = ".75rem";
@@ -1057,14 +1140,72 @@ function renderQR(fname, sizeKB){
   info.innerHTML = '<b style="color:#a8d8ff">' + escapeHtml(fname) + '</b><br>' + sizeKB + ' KB · ' + state.photos.length + ' foto' + (state.photos.length>1?'s':'');
   wrap.appendChild(info);
 
-  // Botón WhatsApp
   var waMsg = encodeURIComponent("💫 Te hice una galaxia de amor ✨\nÁbrela abriendo este archivo: " + fname);
   var wa = document.createElement("button");
   wa.className = "btn btn-wa";
   wa.textContent = "💬 Compartir por WhatsApp";
   wa.style.marginTop = "12px";
+  wa.style.marginBottom = "0";
   wa.onclick = function(){ window.open("https://wa.me/?text=" + waMsg, "_blank"); };
   wrap.appendChild(wa);
+}
+
+/* ========== Compartir la página (editor) ========== */
+function initShare(){
+  var shareBtn = document.getElementById("share-float");
+  var menu = document.getElementById("share-menu");
+  var closeBtn = document.getElementById("share-close");
+  var wa = document.getElementById("share-wa");
+  var copyBtn = document.getElementById("share-copy");
+  var sysBtn = document.getElementById("share-sys");
+
+  if (!shareBtn || !menu) return;
+
+  var pageURL = window.location.href.split("#")[0].split("?")[0];
+  var pageTitle = "Crea tu galaxia de amor ✨";
+  var pageText = "Mira este editor para crear una galaxia personalizada con tus fotos y regalarla 💫\n" + pageURL;
+
+  function openMenu(){
+    wa.href = "https://wa.me/?text=" + encodeURIComponent(pageText);
+    menu.classList.add("show");
+  }
+  function closeMenu(){ menu.classList.remove("show"); }
+
+  shareBtn.addEventListener("click", openMenu);
+  closeBtn.addEventListener("click", closeMenu);
+  menu.addEventListener("click", function(e){ if (e.target === menu) closeMenu(); });
+
+  copyBtn.addEventListener("click", async function(){
+    try {
+      await navigator.clipboard.writeText(pageURL);
+      showStatus("Enlace copiado ✓");
+      setTimeout(closeMenu, 400);
+    } catch(e){
+      var ta = document.createElement("textarea");
+      ta.value = pageURL;
+      document.body.appendChild(ta);
+      ta.select();
+      try { document.execCommand("copy"); showStatus("Enlace copiado ✓"); }
+      catch(_){ showStatus("No se pudo copiar", false); }
+      ta.remove();
+      setTimeout(closeMenu, 400);
+    }
+  });
+
+  sysBtn.addEventListener("click", async function(){
+    if (navigator.share){
+      try {
+        await navigator.share({
+          title: pageTitle,
+          text: "Crea tu galaxia de amor 💫",
+          url: pageURL
+        });
+        closeMenu();
+      } catch(e){}
+    } else {
+      showStatus("Tu navegador no soporta compartir nativo", false);
+    }
+  });
 }
 
 /* ========== Init ========== */
@@ -1073,7 +1214,6 @@ function initEditor(){
   $("btn-view").addEventListener("click", visualize);
   $("btn-generate").addEventListener("click", download);
 
-  // Live update del state al escribir
   ["i-name","i-from","i-date","i-sub","i-msg","i-phrases"].forEach(function(id){
     $(id).addEventListener("input", readInputs);
   });
@@ -1089,6 +1229,7 @@ function initEditor(){
 }
 
 initEditor();
+initShare();
 </script>
 
 </body>
