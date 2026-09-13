@@ -139,8 +139,8 @@
 
             <div class="bg-amber-50 border border-amber-200 rounded-xl p-4 text-center">
                 <p class="text-amber-800 text-sm">
-                    ⚡ <strong>Tu clave de Hugging Face ya está configurada.</strong> 
-                    Si da error, verifica que tu token sea válido en huggingface.co/settings/tokens
+                    ⚡ <strong>Con proxy incluido para GitHub Pages.</strong> 
+                    Si falla, el proxy puede estar saturado — intenta de nuevo o usa Netlify.
                 </p>
             </div>
         </div>
@@ -236,10 +236,12 @@
 
         try {
             const apiUrl = MODELOS[modeloSeleccionado];
+            // ✅ PROXY PARA SALTAR EL BLOQUEO DE CORS
+            const proxyUrl = "https://corsproxy.io/?" + encodeURIComponent(apiUrl);
             
             actualizarProgreso(30, "Enviando a Hugging Face...");
             
-            const respuesta = await fetch(apiUrl, {
+            const respuesta = await fetch(proxyUrl, {
                 method: 'POST',
                 headers: {
                     'Authorization': `Bearer ${HF_TOKEN}`,
@@ -269,7 +271,7 @@
             
         } catch (error) {
             console.error(error);
-            alert('❌ Error: ' + error.message + '\n\n💡 Si el error dice "CORS", sube esta página a Netlify o Vercel gratis y funcionará perfecto.');
+            alert('❌ Error: ' + error.message + '\n\n💡 Si el proxy falla, la solución definitiva es subirlo a Netlify.com GRATIS');
             zonaProgreso.classList.add('hidden');
             zonaPreview.classList.remove('hidden');
         }
