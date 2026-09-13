@@ -10,12 +10,10 @@
 <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&family=Pacifico&family=Permanent+Marker&family=Dancing+Script:wght@600;700&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body{width:100%;min-height:100dvh;overflow-x:hidden;background:radial-gradient(ellipse at top,#0b1530 0%,#000308 70%);font-family:'Inter',sans-serif;color:#fff}
-canvas{display:block;position:fixed;inset:0;touch-action:none}
-
-/* ============ EDITOR ============ */
-#editor{position:relative;z-index:10;max-width:520px;margin:0 auto;padding:28px 20px 120px}
-#editor.hidden{display:none}
+html,body{width:100%;min-height:100dvh;background:#000308;font-family:'Inter',sans-serif;color:#fff;overflow-x:hidden}
+body{display:flex;flex-direction:column;min-height:100dvh}
+canvas.galaxy{display:block;position:fixed;inset:0;touch-action:none;z-index:1}
+#editor{position:relative;z-index:10;max-width:540px;margin:0 auto;padding:28px 20px 120px}
 .hero{text-align:center;margin-bottom:26px}
 .hero h1{font-family:'Permanent Marker',cursive;font-size:clamp(1.9rem,7vw,2.8rem);line-height:1.05;background:linear-gradient(90deg,#00d4ff,#7b2ff7,#f107a3,#ff6b35,#00d4ff);background-size:300% 300%;-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;animation:flow 5s infinite;letter-spacing:1px;filter:drop-shadow(0 0 30px rgba(0,191,255,.4))}
 @keyframes flow{0%,100%{background-position:0% 50%}50%{background-position:100% 50%}}
@@ -49,21 +47,23 @@ canvas{display:block;position:fixed;inset:0;touch-action:none}
 .btn-wa.show{display:flex}
 .btn-copy{background:rgba(255,255,255,.08);color:#a8d8ff;border:1px solid rgba(0,191,255,.35);display:none}
 .btn-copy.show{display:flex}
-.info{font-size:.72rem;color:#7f9dbf;text-align:center;margin-bottom:14px;line-height:1.5;background:rgba(0,191,255,.06);padding:10px;border-radius:10px}
 .result{display:none;margin-top:16px;padding:16px;background:rgba(0,212,255,.08);border:1px solid rgba(0,212,255,.35);border-radius:12px;text-align:center}
 .result.show{display:block;animation:pop .4s}
 @keyframes pop{from{transform:scale(.9);opacity:0}to{transform:scale(1);opacity:1}}
 .result .label{font-size:.72rem;color:#7f9dbf;text-transform:uppercase;letter-spacing:.8px;margin-bottom:6px}
-.result .url{font-family:monospace;font-size:.7rem;color:#87CEEB;word-break:break-all;background:rgba(0,0,0,.3);padding:10px;border-radius:8px;margin-bottom:12px;max-height:100px;overflow:auto}
-.size-warn{font-size:.7rem;color:#ffb84d;margin-top:6px;text-align:center}
-.size-warn.err{color:#ef4444;font-weight:600}
+.result .url{font-family:monospace;font-size:.72rem;color:#87CEEB;word-break:break-all;background:rgba(0,0,0,.3);padding:10px;border-radius:8px;margin-bottom:12px;max-height:100px;overflow:auto}
 #status{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(120%);background:linear-gradient(135deg,#22c55e,#16a34a);color:#fff;padding:13px 24px;border-radius:12px;font-size:.9rem;font-weight:600;z-index:1000;transition:transform .35s;pointer-events:none;max-width:90vw;text-align:center;box-shadow:0 12px 34px rgba(0,0,0,.5)}
 #status.show{transform:translateX(-50%) translateY(0)}
 #status.err{background:linear-gradient(135deg,#ef4444,#dc2626)}
-footer{text-align:center;margin-top:30px;font-size:.75rem;color:#5c7391}
-
-/* ============ GALAXIA ============ */
-#galaxy{display:none}
+#loading{position:fixed;inset:0;background:rgba(0,0,0,.75);backdrop-filter:blur(8px);display:none;align-items:center;justify-content:center;z-index:900;flex-direction:column;gap:14px;color:#87CEEB}
+#loading.show{display:flex}
+.spinner{width:44px;height:44px;border:4px solid rgba(0,212,255,.2);border-top-color:#00d4ff;border-radius:50%;animation:spin 1s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+#error-msg{display:none;padding:40px 20px;text-align:center;position:relative;z-index:10}
+#error-msg h1{font-size:1.5rem;color:#ef4444;margin-bottom:12px}
+#error-msg p{color:#87CEEB;margin-bottom:20px}
+#error-msg a{color:#00d4ff;text-decoration:none;font-weight:600}
+#galaxy{display:none;position:fixed;inset:0;z-index:5}
 #galaxy.show{display:block}
 #start{position:fixed;inset:0;display:flex;flex-direction:column;justify-content:center;align-items:center;background:radial-gradient(ellipse at center,#0b1530 0%,#000308 70%);z-index:800;padding:24px;text-align:center;transition:opacity .6s}
 #start.hidden{opacity:0;pointer-events:none;visibility:hidden}
@@ -83,15 +83,10 @@ footer{text-align:center;margin-top:30px;font-size:.75rem;color:#5c7391}
 #modal-desc.show{display:block}
 #modal-msg{font-family:'Caveat',cursive;font-size:clamp(1.35rem,5.5vw,2.4rem);color:#a8d8ff;line-height:1.35;white-space:pre-wrap;overflow-wrap:anywhere}
 #modal-close{position:absolute;top:10px;right:10px;width:38px;height:38px;border-radius:50%;background:rgba(0,0,0,.45);border:1px solid rgba(0,191,255,.4);color:#fff;font-size:22px;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1;z-index:10}
-#music-btn{position:fixed;top:max(14px,env(safe-area-inset-top,14px));left:14px;z-index:850;width:46px;height:46px;border-radius:50%;border:1px solid rgba(0,191,255,.4);background:rgba(8,15,28,.85);backdrop-filter:blur(10px);color:#a8d8ff;font-size:20px;cursor:pointer;display:none;align-items:center;justify-content:center;touch-action:manipulation}
-#music-btn.show{display:flex}
-#music-btn.playing{background:linear-gradient(135deg,#00d4ff,#7b2ff7);color:#fff;border-color:transparent}
-@media(max-width:720px){#music-btn{top:max(10px,env(safe-area-inset-top,10px));left:10px;width:42px;height:42px;font-size:18px}}
 </style>
 </head>
 <body>
 
-<!-- ============ EDITOR ============ -->
 <div id="editor">
   <div class="hero">
     <h1>Tu galaxia de amor</h1>
@@ -99,8 +94,6 @@ footer{text-align:center;margin-top:30px;font-size:.75rem;color:#5c7391}
   </div>
 
   <div class="card">
-    <div class="info">💡 Recomendado: <b>1 foto pequeña</b> para que el link quepa en WhatsApp.</div>
-
     <div class="fld">
       <label for="i-name">Para quién es</label>
       <input id="i-name" type="text" maxlength="30" placeholder="Ej: Para María" value="Mi amor">
@@ -115,9 +108,9 @@ footer{text-align:center;margin-top:30px;font-size:.75rem;color:#5c7391}
 Cada estrella me recuerda a ti.</textarea>
     </div>
     <div class="fld">
-      <label>Tus fotos (máx. 2)</label>
+      <label>Tus fotos (máx. 5)</label>
       <label class="file-drop" for="i-photo" id="file-drop">
-        <span id="f-label">📷 Añadir foto</span>
+        <span id="f-label">📷 Añadir fotos</span>
         <input id="i-photo" type="file" accept="image/*" multiple hidden>
       </label>
       <div id="photo-list"></div>
@@ -128,7 +121,6 @@ Cada estrella me recuerda a ti.</textarea>
     </div>
 
     <button id="btn-generate" class="btn btn-primary">✨ Generar mi link mágico</button>
-    <div id="size-warn" class="size-warn"></div>
 
     <div id="result" class="result">
       <div class="label">Tu link está listo</div>
@@ -137,11 +129,14 @@ Cada estrella me recuerda a ti.</textarea>
       <button id="btn-copy" class="btn btn-copy">🔗 Copiar link</button>
     </div>
   </div>
-
-  <footer>Sin servidores · Todo va dentro del link</footer>
 </div>
 
-<!-- ============ GALAXIA ============ -->
+<div id="error-msg">
+  <h1>Link inválido</h1>
+  <p>El enlace parece estar roto o incompleto.</p>
+  <a href="./">Crear uno nuevo</a>
+</div>
+
 <div id="galaxy">
   <div id="start" class="hidden">
     <div id="start-title"></div>
@@ -149,7 +144,6 @@ Cada estrella me recuerda a ti.</textarea>
     <button id="start-btn">Toca para iniciar</button>
   </div>
   <div id="hint">👆 Arrastra · 🤏 Pellizca · Toca las fotos ✨</div>
-  <button id="music-btn">🔇</button>
   <div id="modal">
     <div id="modal-box">
       <button id="modal-close">×</button>
@@ -161,10 +155,8 @@ Cada estrella me recuerda a ti.</textarea>
 </div>
 
 <div id="status"></div>
+<div id="loading"><div class="spinner"></div><div>Creando tu galaxia...</div></div>
 
-<!-- ============ PAKO (compresión) ============ -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pako/2.1.0/pako.min.js"></script>
-<!-- ============ THREE.JS + POSTPROCESSING ============ -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/postprocessing/EffectComposer.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/postprocessing/RenderPass.js"></script>
@@ -174,9 +166,11 @@ Cada estrella me recuerda a ti.</textarea>
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/postprocessing/UnrealBloomPass.js"></script>
 
 <script>
-/* ============================================================
-   FRASES Y PALETAS (constantes)
-   ============================================================ */
+/* ========== CONFIG (Access Key) ========== */
+var JSONBIN_ACCESS_KEY = "$2a$10$.9skm.iNxEe2snyX/2z6JuH.kaqdheGtxUJ67x1TKg3g1Vb2aYlbq";
+var GITHUB_USER = "c4rlo53305";
+var GITHUB_REPO = "ai";
+
 var LOVE_PHRASES = ("Te amo|Eres mi todo|Mi corazón es tuyo|Eres mi universo|Sin ti no soy nada|Eres mi razón de ser|Te pienso a cada instante|Mi vida es tuya|Eres mi sueño hecho realidad|Contigo todo es mejor|Eres mi persona favorita|Te elegiría mil veces|Eres mi hogar|Mi lugar seguro eres tú|Eres mi paz|Eres mi caos favorito|Te amaré siempre|Mi amor por ti es infinito|Eres mi estrella|Eres mi luz|Brillas más que todas las estrellas|Eres mi felicidad|Me haces muy feliz|Eres mi mejor casualidad|Te llevo en el alma|Eres mi destino|Mi corazón late por ti|El amor de mi vida|Mi persona|Mi todo|Mi vida|Mi amor|Mi cielo|Mi sol|Mi luna|Mi universo entero|Eres perfecta para mí|Eres perfecto para mí|Eres mi debilidad|Tu sonrisa me ilumina|Tus ojos son mi perdición|Me pierdo en tu mirada|Eres mi pensamiento favorito|Pienso en ti sin parar|Te sueño despierto|Eres mi sueño cumplido|Me encantas|Me gustas muchísimo|Me vuelves loco|Estoy loco por ti|Doy todo por ti|Por ti daría el mundo|Por ti cruzaría el universo|Eres mi paraíso|Contigo hasta el fin|Contigo soy feliz|Tú y yo por siempre|Tú y yo hasta el final|Nuestro amor es eterno|Siempre juntos|Juntos para siempre|Eres mi complemento|Eres mi otra mitad|Sin ti me falta algo|Eres mi pedacito de cielo|Eres mi ángel|Mi ángel guardián|Cuido de ti siempre|Te protejo con mi vida|Eres mi tesoro|Mi mayor tesoro|Lo más valioso que tengo|Mi razón de vivir|Por quien respiro|Por quien vivo|Mi motivación diaria|Cada día te amo más|Te amo cada día más|Mi amor crece cada día|Eres mi adicción|Adicto a tu amor|Adicto a ti|Me enamoré de ti|Vuelvo a enamorarme cada día|Enamorado de ti|Locamente enamorado|Perdidamente enamorado|Enamorado hasta los huesos|Amor de mi vida|El amor de mi vida|Mi único amor|Mi gran amor|Mi primer y último amor|Mi amor eterno|Mi amor infinito|Te quiero mucho|Te quiero con el alma|Te quiero con todo mi ser|Te adoro|Te idolatro|Te venero|Te amo sin medida|Te amo sin condiciones|Te amo sin reservas|Te amo con todo mi corazón|Corazón mío|Dueño de mi corazón|Dueña de mi corazón|Mi dueño|Mi dueña|Mi debilidad|Mi fortaleza|Mi refugio|Mi casa|Mi todo entero|Eres mi mundo|Mi mundo entero|Mi planetita|Mi persona especial|Mi persona favorita en el mundo|Mi favorito|Mi favorita|Mi consentido|Mi consentida|Mi niño|Mi niña|Mi bebé|Mi amor chiquito|Mi vida entera|Mi vida misma|Razón de mi existir|Me haces mejor persona|Me haces querer ser mejor|Por ti mejoro cada día|Eres mi inspiración|Mi musa|Mi inspiración diaria|Poeta por ti|Escribiría mil poemas por ti|Canciones para ti|Solo canto por ti|Compongo para ti|Eres mi canción favorita|Mi melodía|Mi sinfonía|Mi ritmo|Mi compás|El latido de mi corazón|El aire que respiro|Mi alimento del alma|Mi oxígeno|Sin ti me ahogo|Contigo respiro|Contigo todo tiene sentido|Contigo es todo bonito|Haces todo más bonito|Embelleces mi vida|Pintas de colores mi mundo|Pintas mi vida|Mi artista favorito|Me gusta cómo eres|Me encanta cómo eres|Eres increíble|Eres maravilloso|Eres maravillosa|Eres espectacular|Eres única|Eres único|No hay otra como tú|No hay otro como tú|Irrepetible|Inigualable|Perfecto para mí|Perfecta para mí|Tal como eres te amo|Te amo tal como eres|Con todos tus defectos te amo|Con todas tus virtudes te amo|Te amo con tus días malos|Amo hasta tus silencios|Amo tus abrazos|Amo tus besos|Amo tu voz|Amo tu risa|Amo tu sonrisa|Amo tu mirada|Amo tus manos|Amo tu forma de ser|Amo estar contigo|Amo tus locuras|Amo tus ocurrencias|Eres mi persona loca favorita|Mi compañero de aventuras|Mi compañera de vida|Compañero de sueños|Compañera eterna|Juntos somos uno|Los dos somos uno|Alma gemela|Mi alma gemela|Mi media naranja|La otra mitad de mí|Sin ti estoy incompleto|Sin ti estoy incompleta|Me complementas|Me completas|Me haces sentir completo|Me haces sentir en casa|Contigo estoy en casa|En tus brazos encuentro paz|En tus abrazos soy feliz|Entre tus brazos me quedo|Quiero envejecer contigo|Contigo hasta viejitos|Quiero toda una vida contigo|Toda la eternidad contigo|Eres mi siempre|Mi para siempre|Mi infinidad|Infinitamente tuyo|Infinitamente tuya|Te amo al infinito|Al infinito y más allá|Hasta el infinito|Hasta la eternidad|Por siempre jamás|Por toda la eternidad|Siempre tuyo|Siempre tuya|Eres y serás mi amor").split("|");
 
 var PALETTES = {
@@ -189,52 +183,6 @@ var PALETTES = {
   stardust:{name:"Blanco estelar",emoji:"🤍",colors:["#ffffff","#e8f0ff","#c0d8ff","#90b0ff","#5060c0"]}
 };
 
-/* ============================================================
-   HELPERS DE COMPRESIÓN
-   ============================================================ */
-function b64urlEncode(str){
-  return btoa(str).replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/,"");
-}
-function b64urlDecode(str){
-  str = str.replace(/-/g,"+").replace(/_/g,"/");
-  while (str.length % 4) str += "=";
-  return atob(str);
-}
-function packData(obj){
-  var json = JSON.stringify(obj);
-  var bytes = new TextEncoder().encode(json);
-  var compressed = pako.deflate(bytes, { level: 9 });
-  var bin = "";
-  for (var i = 0; i < compressed.length; i++) bin += String.fromCharCode(compressed[i]);
-  return b64urlEncode(bin);
-}
-function unpackData(str){
-  var bin = b64urlDecode(str);
-  var bytes = new Uint8Array(bin.length);
-  for (var i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
-  var decompressed = pako.inflate(bytes);
-  var json = new TextDecoder().decode(decompressed);
-  return JSON.parse(json);
-}
-
-/* ============================================================
-   ROUTER: /#DATOS → galaxia, / → editor
-   ============================================================ */
-function isViewerMode(){
-  return location.hash.length > 1;
-}
-
-/* ============================================================
-   EDITOR
-   ============================================================ */
-var editorState = {
-  name: "Mi amor",
-  subtitle: "Una experiencia galáctica te espera",
-  message: "Eres mi universo entero ✨\nCada estrella me recuerda a ti.",
-  photos: [],
-  palette: "cosmic"
-};
-var MAX_PHOTOS = 2;
 var $ = function(id){ return document.getElementById(id); };
 
 function showStatus(msg, ok){
@@ -244,8 +192,23 @@ function showStatus(msg, ok){
   s.classList.toggle("err", ok === false);
   s.classList.add("show");
   clearTimeout(showStatus._t);
-  showStatus._t = setTimeout(function(){ s.classList.remove("show"); }, 2600);
+  showStatus._t = setTimeout(function(){ s.classList.remove("show"); }, 3200);
 }
+function showLoading(v){ var l = $("loading"); if (l) l.classList.toggle("show", !!v); }
+function getParam(name){
+  var m = new RegExp("[?&]" + name + "=([^&#]*)").exec(location.search);
+  return m ? decodeURIComponent(m[1]) : null;
+}
+
+/* ============================================================
+   EDITOR
+   ============================================================ */
+var MAX_PHOTOS = 5;
+var editorState = {
+  name: "Mi amor", subtitle: "Una experiencia galáctica te espera",
+  message: "Eres mi universo entero ✨\nCada estrella me recuerda a ti.",
+  photos: [], palette: "cosmic"
+};
 
 function renderPhotoList(){
   var list = $("photo-list");
@@ -256,20 +219,20 @@ function renderPhotoList(){
     var thumb = document.createElement("div"); thumb.className = "thumb";
     var im = document.createElement("img"); im.src = p.url; im.alt = "foto " + (i+1);
     var del = document.createElement("button"); del.textContent = "×"; del.type = "button";
-    del.onclick = function(){ editorState.photos.splice(i,1); renderPhotoList(); updateSizeWarning(); };
+    del.onclick = function(){ editorState.photos.splice(i,1); renderPhotoList(); };
     thumb.appendChild(im); thumb.appendChild(del);
     var meta = document.createElement("div"); meta.className = "meta";
     var n = document.createElement("div"); n.className = "filename"; n.textContent = "Foto #" + (i+1);
     var ta = document.createElement("textarea");
-    ta.placeholder = "Descripción..."; ta.maxLength = 100; ta.value = p.desc || "";
-    ta.addEventListener("input", function(){ p.desc = ta.value; updateSizeWarning(); });
+    ta.placeholder = "Descripción..."; ta.maxLength = 120; ta.value = p.desc || "";
+    ta.addEventListener("input", function(){ p.desc = ta.value; });
     meta.appendChild(n); meta.appendChild(ta);
     block.appendChild(thumb); block.appendChild(meta);
     list.appendChild(block);
   });
   $("f-label").textContent = editorState.photos.length === 0
-    ? "📷 Añadir foto (máx. " + MAX_PHOTOS + ")"
-    : "✓ " + editorState.photos.length + "/" + MAX_PHOTOS;
+    ? "📷 Añadir fotos (máx. " + MAX_PHOTOS + ")"
+    : "✓ " + editorState.photos.length + "/" + MAX_PHOTOS + " · añadir más";
   $("file-drop").classList.toggle("has-file", editorState.photos.length > 0);
 }
 
@@ -285,13 +248,12 @@ async function addPhotos(files){
       rd.onload = function(ev){
         var img = new Image();
         img.onload = function(){
-          // Redimensión agresiva para que el link quepa
-          var maxW = 500;
+          var maxW = 350;
           var s = Math.min(1, maxW / img.width);
           var w = Math.round(img.width * s), h = Math.round(img.height * s);
           var cv = document.createElement("canvas"); cv.width = w; cv.height = h;
           cv.getContext("2d").drawImage(img, 0, 0, w, h);
-          res(cv.toDataURL("image/jpeg", 0.72));
+          res(cv.toDataURL("image/jpeg", 0.6));
         };
         img.src = ev.target.result;
       };
@@ -300,26 +262,6 @@ async function addPhotos(files){
     editorState.photos.push({ url: url, desc: "" });
   }
   renderPhotoList();
-  updateSizeWarning();
-}
-
-function updateSizeWarning(){
-  var warn = $("size-warn");
-  if (!warn) return;
-  try {
-    var pack = packData(buildPayload());
-    var totalLen = pack.length + 60;
-    if (totalLen > 60000){
-      warn.textContent = "⚠️ Link de " + totalLen.toLocaleString() + " caracteres · puede no caber en WhatsApp";
-      warn.classList.add("err");
-    } else if (totalLen > 40000){
-      warn.textContent = "Link de " + totalLen.toLocaleString() + " caracteres · funciona, algo largo";
-      warn.classList.remove("err");
-    } else {
-      warn.textContent = "Link de " + totalLen.toLocaleString() + " caracteres ✓";
-      warn.classList.remove("err");
-    }
-  } catch(e){ warn.textContent = ""; }
 }
 
 function renderPalettes(){
@@ -337,36 +279,57 @@ function renderPalettes(){
     });
     var t = document.createElement("div"); t.textContent = pal.emoji + " " + pal.name; t.style.flex = "1";
     b.appendChild(sw); b.appendChild(t);
-    b.onclick = function(){ editorState.palette = key; renderPalettes(); updateSizeWarning(); };
+    b.onclick = function(){ editorState.palette = key; renderPalettes(); };
     grid.appendChild(b);
   });
 }
 
-function buildPayload(){
-  // Claves cortas para ahorrar bytes en el link
-  return {
-    n: editorState.name,
-    s: editorState.subtitle,
-    m: editorState.message,
-    p: editorState.photos,
-    pal: editorState.palette
-  };
-}
-
-function generate(){
+async function generate(){
   editorState.name = $("i-name").value.trim() || "Dedicatoria";
   editorState.subtitle = $("i-sub").value.trim();
   editorState.message = $("i-msg").value;
 
-  if (editorState.photos.length === 0){
-    showStatus("Añade al menos una foto", false);
-    return;
-  }
+  if (editorState.photos.length === 0){ showStatus("Añade al menos una foto", false); return; }
 
+  showLoading(true);
   try {
-    var packed = packData(buildPayload());
-    var base = location.origin + location.pathname;
-    var link = base + "#" + packed;
+    var payload = {
+      name: editorState.name,
+      subtitle: editorState.subtitle,
+      message: editorState.message,
+      photos: editorState.photos,
+      palette: editorState.palette
+    };
+    var jsonStr = JSON.stringify(payload);
+    var sizeKB = (jsonStr.length/1024).toFixed(1);
+    console.log("Tamaño JSON:", sizeKB, "KB");
+    if (jsonStr.length > 95 * 1024){
+      throw new Error("Contenido muy pesado (" + sizeKB + " KB). Reduce fotos.");
+    }
+
+    var resp = await fetch("https://api.jsonbin.io/v3/b", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-Access-Key": JSONBIN_ACCESS_KEY,
+        "X-Bin-Name": "dedicatoria-" + Date.now(),
+        "X-Bin-Private": "false"
+      },
+      body: jsonStr
+    });
+
+    if (!resp.ok){
+      var errTxt = await resp.text();
+      console.error("JsonBin:", resp.status, errTxt);
+      throw new Error("Error " + resp.status + ": " + errTxt.slice(0, 150));
+    }
+
+    var result = await resp.json();
+    var binId = result.metadata.id;
+    console.log("Bin ID:", binId);
+
+    var base = "https://" + GITHUB_USER + ".github.io/" + GITHUB_REPO + "/";
+    var link = base + "?id=" + binId;
 
     $("result-url").textContent = link;
     $("result").classList.add("show");
@@ -384,36 +347,30 @@ function generate(){
     showStatus("¡Link generado!");
   } catch(err){
     console.error(err);
-    showStatus("Error: " + err.message, false);
+    showStatus(err.message || "Error al guardar", false);
+  } finally {
+    showLoading(false);
   }
 }
 
 function initEditor(){
   $("i-photo").addEventListener("change", function(e){ addPhotos(e.target.files); e.target.value = ""; });
-  $("i-name").addEventListener("input", function(){ editorState.name = $("i-name").value; updateSizeWarning(); });
-  $("i-sub").addEventListener("input", function(){ editorState.subtitle = $("i-sub").value; updateSizeWarning(); });
-  $("i-msg").addEventListener("input", function(){ editorState.message = $("i-msg").value; updateSizeWarning(); });
   $("btn-generate").addEventListener("click", generate);
 
   var drop = $("file-drop");
   ["dragenter","dragover"].forEach(function(ev){ drop.addEventListener(ev, function(e){ e.preventDefault(); drop.style.borderColor = "#00d4ff"; }); });
   ["dragleave","drop"].forEach(function(ev){ drop.addEventListener(ev, function(e){ e.preventDefault(); drop.style.borderColor = ""; }); });
-  drop.addEventListener("drop", function(e){
-    e.preventDefault();
-    if (e.dataTransfer.files) addPhotos(e.dataTransfer.files);
-  });
+  drop.addEventListener("drop", function(e){ e.preventDefault(); if (e.dataTransfer.files) addPhotos(e.dataTransfer.files); });
 
   renderPalettes();
   renderPhotoList();
-  updateSizeWarning();
 }
 
 /* ============================================================
-   GALAXIA (visor)
+   GALAXIA
    ============================================================ */
 var G = {
-  name: "", subtitle: "", message: "",
-  photos: [], palette: "cosmic",
+  data: null, isMobile: false, isLowEnd: false,
   scene: null, camera: null, renderer: null, composer: null, bloom: null,
   galaxy: null, bgStars: null, glow: null,
   spriteContainer: null, worldGroup: null,
@@ -424,10 +381,12 @@ var G = {
   rotation: { x: 0.35, y: 0 },
   rotationVel: { x: 0, y: 0 },
   currentZoom: 24, targetZoom: 24,
-  pointers: new Map(),
+  pointers: {}, pointersCount: 0,
   lastPinchDist: null, tapStart: null, hoveredPhoto: null,
   clock: null, lastFrame: 0,
-  uBg: null, uGal: null
+  uBg: null, uGal: null,
+  GALAXY_COUNT: 60000, BG_COUNT: 1500,
+  streakTex: null
 };
 var ROT_LIMIT_X = 1.25, AUTO_ROT = 0.0009, ZOOM_MIN = 8, ZOOM_MAX = 60;
 
@@ -441,43 +400,43 @@ function roundedRect(ctx,x,y,w,h,r){
 }
 
 function initGalaxy(data){
-  G.name = data.n || "Dedicatoria";
-  G.subtitle = data.s || "";
-  G.message = data.m || "";
-  G.photos = data.p || [];
-  G.palette = data.pal || "cosmic";
+  G.data = data;
+  G.name = data.name || "Dedicatoria";
+  G.subtitle = data.subtitle || "";
+  G.message = data.message || "";
+  G.photos = data.photos || [];
+  G.palette = data.palette || "cosmic";
 
   $("start-title").textContent = G.name;
   $("start-sub").textContent = G.subtitle;
   $("modal-msg").textContent = G.message;
 
-  if (typeof THREE === "undefined") return;
+  if (typeof THREE === "undefined"){ console.error("Three.js no cargó"); return; }
 
-  var isMobile = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent)
+  G.isMobile = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent)
     || (window.matchMedia && matchMedia("(pointer:coarse)").matches) || innerWidth < 720;
-  var isLowEnd = isMobile && (devicePixelRatio > 2 || (navigator.hardwareConcurrency || 4) <= 4);
-  G.GALAXY_COUNT = isMobile ? (isLowEnd ? 35000 : 55000) : 120000;
-  G.BG_COUNT = isMobile ? 1200 : 2800;
-  G.isMobile = isMobile;
-  G.isLowEnd = isLowEnd;
+  G.isLowEnd = G.isMobile && (devicePixelRatio > 2 || (navigator.hardwareConcurrency || 4) <= 4);
+  G.GALAXY_COUNT = G.isMobile ? (G.isLowEnd ? 35000 : 55000) : 120000;
+  G.BG_COUNT = G.isMobile ? 1200 : 2800;
 
   G.raycaster = new THREE.Raycaster();
   G.tmpNdc = new THREE.Vector2();
   G.clock = new THREE.Clock();
-  G.uBg = { uTime:{value:0}, uPixelRatio:{value:Math.min(devicePixelRatio, isMobile?1.5:2)} };
-  G.uGal = { uTime:{value:0}, uPixelRatio:{value:Math.min(devicePixelRatio, isMobile?1.5:2)} };
+  G.uBg = { uTime:{value:0}, uPixelRatio:{value:Math.min(devicePixelRatio, G.isMobile?1.5:2)} };
+  G.uGal = { uTime:{value:0}, uPixelRatio:{value:Math.min(devicePixelRatio, G.isMobile?1.5:2)} };
 
   G.scene = new THREE.Scene();
   G.scene.fog = new THREE.FogExp2(0x000308, 0.0020);
   G.camera = new THREE.PerspectiveCamera(68, innerWidth/innerHeight, 0.1, 4000);
   G.camera.position.set(0, 6, G.currentZoom);
-  G.renderer = new THREE.WebGLRenderer({ antialias: !isLowEnd, powerPreference: "high-performance" });
+  G.renderer = new THREE.WebGLRenderer({ antialias: !G.isLowEnd, powerPreference: "high-performance" });
   G.renderer.setSize(innerWidth, innerHeight);
-  G.renderer.setPixelRatio(Math.min(devicePixelRatio, isMobile ? 1.5 : 2));
+  G.renderer.setPixelRatio(Math.min(devicePixelRatio, G.isMobile ? 1.5 : 2));
   G.renderer.setClearColor(0x000308, 1);
   G.renderer.toneMapping = THREE.ACESFilmicToneMapping;
   G.renderer.toneMappingExposure = 0.95;
   if (G.renderer.outputEncoding !== undefined) G.renderer.outputEncoding = THREE.sRGBEncoding;
+  G.renderer.domElement.className = "galaxy";
   document.body.insertBefore(G.renderer.domElement, document.body.firstChild);
 
   G.worldGroup = new THREE.Group(); G.scene.add(G.worldGroup);
@@ -491,7 +450,7 @@ function initGalaxy(data){
   G.composer = new THREE.EffectComposer(G.renderer);
   G.composer.addPass(new THREE.RenderPass(G.scene, G.camera));
   G.bloom = new THREE.UnrealBloomPass(new THREE.Vector2(innerWidth,innerHeight),
-    isMobile ? 0.42 : 0.55, 0.45, 0.92);
+    G.isMobile ? 0.42 : 0.55, 0.45, 0.92);
   G.composer.addPass(G.bloom);
 
   window.addEventListener("resize", onResize);
@@ -617,9 +576,8 @@ function buildGlow(){
   G.worldGroup.add(G.glow);
 }
 
-var G_streakTex = null;
 function makeStreak(){
-  if (G_streakTex) return G_streakTex;
+  if (G.streakTex) return G.streakTex;
   var w = 256, h = 32;
   var cv = document.createElement("canvas"); cv.width = w; cv.height = h;
   var ctx = cv.getContext("2d");
@@ -638,7 +596,7 @@ function makeStreak(){
   ctx.fillStyle = head; ctx.fillRect(w-32, 0, 32, h);
   var tex = new THREE.CanvasTexture(cv);
   if (tex.encoding !== undefined) tex.encoding = THREE.sRGBEncoding;
-  G_streakTex = tex;
+  G.streakTex = tex;
   return tex;
 }
 
@@ -830,20 +788,21 @@ function onResize(){
 function onDown(e){
   var cv = G.renderer.domElement;
   if (cv.setPointerCapture){ try { cv.setPointerCapture(e.pointerId); } catch(_){} }
-  G.pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+  G.pointers[e.pointerId] = { x: e.clientX, y: e.clientY };
+  G.pointersCount++;
   G.rotationVel.x = 0; G.rotationVel.y = 0;
-  if (G.pointers.size === 2) G.lastPinchDist = null;
-  if (G.pointers.size === 1) G.tapStart = { x: e.clientX, y: e.clientY, t: performance.now() };
+  if (G.pointersCount === 2) G.lastPinchDist = null;
+  if (G.pointersCount === 1) G.tapStart = { x: e.clientX, y: e.clientY, t: performance.now() };
   else G.tapStart = null;
   e.preventDefault();
 }
 function onMove(e){
   G.lastPtr.x = e.clientX; G.lastPtr.y = e.clientY;
-  var p = G.pointers.get(e.pointerId);
+  var p = G.pointers[e.pointerId];
   if (!p) return;
   var prevX = p.x, prevY = p.y;
   p.x = e.clientX; p.y = e.clientY;
-  if (G.pointers.size === 1){
+  if (G.pointersCount === 1){
     var dx = p.x - prevX, dy = p.y - prevY;
     G.rotation.y += dx*0.006;
     G.rotation.x += dy*0.006;
@@ -853,9 +812,10 @@ function onMove(e){
       var tdx = p.x - G.tapStart.x, tdy = p.y - G.tapStart.y;
       if (tdx*tdx + tdy*tdy > 100) G.tapStart = null;
     }
-  } else if (G.pointers.size >= 2){
-    var pts = Array.from(G.pointers.values());
-    var ddx = pts[1].x - pts[0].x, ddy = pts[1].y - pts[0].y;
+  } else if (G.pointersCount >= 2){
+    var keys = Object.keys(G.pointers);
+    var p1 = G.pointers[keys[0]], p2 = G.pointers[keys[1]];
+    var ddx = p2.x - p1.x, ddy = p2.y - p1.y;
     var dist = Math.sqrt(ddx*ddx + ddy*ddy);
     if (G.lastPinchDist !== null){
       G.targetZoom += (G.lastPinchDist - dist)*0.07;
@@ -869,15 +829,16 @@ function onMove(e){
 function onUp(e){
   var cv = G.renderer.domElement;
   if (cv.releasePointerCapture){ try { cv.releasePointerCapture(e.pointerId); } catch(_){} }
-  if (G.pointers.size === 1 && G.tapStart){
+  if (G.pointersCount === 1 && G.tapStart){
     var dt = performance.now() - G.tapStart.t;
     var dx = e.clientX - G.tapStart.x, dy = e.clientY - G.tapStart.y;
     if (dt < 400 && Math.sqrt(dx*dx+dy*dy) < 12) tryPhotoClick(e.clientX, e.clientY);
     G.tapStart = null;
   }
-  G.pointers.delete(e.pointerId);
-  if (G.pointers.size < 2) G.lastPinchDist = null;
-  if (G.pointers.size === 0) G.tapStart = null;
+  delete G.pointers[e.pointerId];
+  G.pointersCount = Math.max(0, G.pointersCount - 1);
+  if (G.pointersCount < 2) G.lastPinchDist = null;
+  if (G.pointersCount === 0) G.tapStart = null;
   e.preventDefault();
 }
 function onWheel(e){
@@ -947,7 +908,7 @@ function animate(){
     G.camera.lookAt(lx, ly, lz);
     if (p >= 1){ var done = G.zoomState; G.zoomState = null; if (done.onDone) done.onDone(); }
   } else {
-    if (G.pointers.size === 0){
+    if (G.pointersCount === 0){
       G.rotation.x += G.rotationVel.x;
       G.rotation.y += G.rotationVel.y + AUTO_ROT;
       G.rotationVel.x *= 0.94; G.rotationVel.y *= 0.94;
@@ -1043,31 +1004,44 @@ function initGalaxyEvents(){
 }
 
 /* ============================================================
+   CARGAR DEDICATORIA DESDE JSONBIN
+   ============================================================ */
+async function loadDedication(binId){
+  var resp = await fetch("https://api.jsonbin.io/v3/b/" + binId + "/latest", {
+    headers: { "X-Access-Key": JSONBIN_ACCESS_KEY }
+  });
+  if (!resp.ok) throw new Error("No se pudo cargar (HTTP " + resp.status + ")");
+  var json = await resp.json();
+  return json.record;
+}
+
+/* ============================================================
    BOOT
    ============================================================ */
-window.addEventListener("DOMContentLoaded", function(){
-  if (isViewerMode()){
-    // Modo galaxia: carga datos del hash
-    $("editor").classList.add("hidden");
-    $("galaxy").classList.add("show");
-    try {
-      var data = unpackData(location.hash.slice(1));
-      initGalaxy(data);
-      initGalaxyEvents();
-    } catch(err){
-      console.error(err);
-      document.body.innerHTML =
-        '<div style="padding:40px;text-align:center;font-family:sans-serif;color:#fff">' +
-        '<h1>Link inválido</h1>' +
-        '<p style="color:#87CEEB;margin-top:10px">El enlace parece estar roto o incompleto.</p>' +
-        '<a href="' + location.pathname + '" style="color:#00d4ff;margin-top:20px;display:inline-block">Crear uno nuevo</a>' +
-        '</div>';
-    }
-  } else {
-    // Modo editor
+window.addEventListener("DOMContentLoaded", async function(){
+  var id = getParam("id");
+  if (!id){
+    $("editor").style.display = "block";
+    $("galaxy").style.display = "none";
     initEditor();
+    return;
+  }
+  $("editor").style.display = "none";
+  $("galaxy").classList.add("show");
+  showLoading(true);
+  try {
+    var data = await loadDedication(id);
+    showLoading(false);
+    initGalaxy(data);
+    initGalaxyEvents();
+  } catch(err){
+    console.error(err);
+    showLoading(false);
+    $("galaxy").classList.remove("show");
+    $("error-msg").style.display = "block";
   }
 });
 </script>
+
 </body>
 </html>
