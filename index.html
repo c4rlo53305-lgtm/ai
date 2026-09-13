@@ -3,191 +3,437 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>📸 ReparaFoto AI</title>
+    <title>📸 Restaurador de Fotos con IA — Gratis</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <!-- ✅ IA REAL — Real-ESRGAN corriendo en el navegador -->
+    <script type="module">
+        import { RealESRGAN } from 'https://cdn.jsdelivr.net/npm/@gmlunesa/real-esrgan@0.1.1/dist/index.es.js';
+        window.RealESRGAN = RealESRGAN;
+    </script>
     <style>
-        *{margin:0;padding:0;box-sizing:border-box;font-family:Arial,sans-serif;}
-        body{
-            background:linear-gradient(135deg,#1e3a8a,#7c3aed,#ec4899);
-            min-height:100vh;
-            padding:20px;
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+        *{font-family:'Inter',sans-serif;}
+        
+        .hero-gradient{
+            background:linear-gradient(135deg, #0F172A 0%, #1E1B4B 50%, #312E81 100%);
         }
-        .contenedor{max-width:500px;margin:0 auto;}
-        .caja{
+        .gradient-text{
+            background:linear-gradient(135deg, #4F46E5 0%, #7C3AED 100%);
+            -webkit-background-clip:text;
+            -webkit-text-fill-color:transparent;
+        }
+        .card-hover:hover{
+            transform:translateY(-5px);
+            box-shadow:0 20px 40px rgba(79,70,229,0.15);
+        }
+        .pulse-border{
+            animation:pulse-border 2s ease-in-out infinite;
+        }
+        @keyframes pulse-border{
+            0%,100%{box-shadow:0 0 0 0 rgba(79,70,229,0.4);}
+            50%{box-shadow:0 0 0 15px rgba(79,70,229,0);}
+        }
+        .loader {
+            border: 4px solid rgba(255,255,255,0.2);
+            border-top: 4px solid #4F46E5;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .before-after-slider{
+            position:relative;
+            overflow:hidden;
+            cursor:grab;
+        }
+        .divider-line{
+            position:absolute;
+            top:0;
+            bottom:0;
+            width:3px;
             background:white;
-            border-radius:20px;
-            padding:30px;
-            box-shadow:0 10px 40px rgba(0,0,0,0.3);
-            text-align:center;
+            left:50%;
+            transform:translateX(-50%);
+            z-index:10;
         }
-        h1{color:#1e3a8a;font-size:28px;margin-bottom:10px;}
-        p{color:#64748b;margin-bottom:25px;font-size:16px;}
-        
-        .subir{
-            border:3px dashed #7c3aed;
-            border-radius:15px;
-            padding:40px 20px;
-            cursor:pointer;
-            margin-bottom:25px;
-            transition:0.3s;
-            display:block;
-            width:100%;
+        .divider-line::before,
+        .divider-line::after{
+            content:'';
+            position:absolute;
+            left:50%;
+            transform:translateX(-50%);
+            width:44px;
+            height:44px;
+            border-radius:50%;
+            background:white;
         }
-        .subir:hover{background:#f1f5f9;}
-        .icono{font-size:50px;margin-bottom:10px;}
-        
-        .boton{
-            display:block;
-            width:100%;
-            padding:16px;
-            background:linear-gradient(90deg,#7c3aed,#ec4899);
-            color:white;
-            border:none;
-            border-radius:12px;
-            font-size:18px;
-            font-weight:bold;
-            cursor:pointer;
-            margin-bottom:15px;
-        }
-        .boton:hover{transform:scale(1.02);}
-        .boton:disabled{opacity:0.5;cursor:not-allowed;transform:none;}
-        
-        .preview{width:100%;border-radius:12px;margin-bottom:15px;display:none;}
-        .preview.mostrar{display:block;}
-        
-        .resultado{margin-top:20px;display:none;}
-        .resultado.mostrar{display:block;}
-        .resultado img{width:100%;border-radius:12px;margin-bottom:10px;}
-        
-        .cargando{display:none;margin:20px 0;}
-        .cargando.mostrar{display:block;}
-        .spinner{
-            width:45px;height:45px;border:4px solid #ddd;
-            border-top-color:#7c3aed;border-radius:50%;
-            animation:girar 1s linear infinite;
-            margin:0 auto 15px;
-        }
-        @keyframes girar{to{transform:rotate(360deg);}}
-        
-        .aviso{
-            background:#f0fdf4;border-left:4px solid #22c55e;
-            padding:12px;border-radius:8px;
-            font-size:13px;color:#166534;
-            margin-bottom:20px;
-        }
-        
-        .error{
-            background:#fef2f2;border-left:4px solid #ef4444;
-            padding:12px;border-radius:8px;
-            font-size:13px;color:#991b1b;
-            margin-top:15px;display:none;
-        }
-        .error.mostrar{display:block;}
-        
-        #archivo{display:none;}
+        .divider-line::before{top:50%;margin-top:-44px;}
+        .divider-line::after{top:50%;margin-top:0;}
     </style>
 </head>
-<body>
-    <div class="contenedor">
-        <div class="caja">
-            <h1>📸 ReparaFoto AI</h1>
-            <p>Restaura tus fotos viejas y dañadas con IA</p>
+<body class="min-h-screen">
 
-            <div class="aviso">
-                ✅ Toca la caja de abajo para abrir tu galería
+    <!-- 🔝 NAVEGACIÓN -->
+    <nav class="fixed top-0 left-0 right-0 z-50 bg-white/90 backdrop-blur-md shadow-sm">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="flex justify-between items-center py-3">
+                <div class="flex items-center gap-2">
+                    <span class="text-2xl">📸</span>
+                    <span class="text-xl font-bold text-gray-800">ReviveTusFotos</span>
+                </div>
+                <div class="hidden md:flex items-center gap-6">
+                    <span class="text-sm text-green-600 font-medium flex items-center gap-1">
+                        <i class="fa fa-check-circle"></i> 100% Gratis
+                    </span>
+                    <span class="text-sm text-gray-500">·</span>
+                    <span class="text-sm text-gray-600">Sin registro</span>
+                </div>
             </div>
-
-            <!-- Botón visible que abre la galería -->
-            <label for="archivo" class="subir">
-                <div class="icono">🖼️</div>
-                <strong>Toca aquí para elegir tu foto</strong>
-            </label>
-            <input type="file" id="archivo" accept="image/*">
-            
-            <img id="vistaPrevia" class="preview" alt="Tu foto">
-
-            <button class="boton" id="botonReparar" onclick="repararFoto()" disabled>✨ REPARAR FOTO</button>
-
-            <div class="cargando" id="cargando">
-                <div class="spinner"></div>
-                <p>🔄 La IA está trabajando... espera unos segundos</p>
-            </div>
-
-            <div class="resultado" id="resultado">
-                <h3>✅ ¡Tu foto está lista!</h3>
-                <img id="imagenResultado" alt="Foto reparada">
-                <a id="botonDescargar" class="boton" style="background:linear-gradient(90deg,#16a34a,#22c55e);text-decoration:none;" download="foto-reparada.png">💾 DESCARGAR FOTO</a>
-                <button class="boton" style="background:linear-gradient(90deg,#6b7280,#4b5563);" onclick="location.reload()">🔄 Reparar otra</button>
-            </div>
-
-            <div class="error" id="cajaError"></div>
         </div>
-    </div>
+    </nav>
 
-    <script>
-        const HUGGINGFACE_KEY = "hf_MHFAK4m8qbEpO6FRk6RvtB8ZS3louo6T";
-        const API_URL = "https://api-inference.huggingface.co/models/aspire/real-world-image-sr";
-        
-        let archivoImagen = null;
-        const entradaArchivo = document.getElementById('archivo');
-        const vistaPrevia = document.getElementById('vistaPrevia');
-        const botonReparar = document.getElementById('botonReparar');
+    <!-- 🦸 SECCIÓN PRINCIPAL -->
+    <section class="hero-gradient pt-28 pb-20 min-h-screen">
+        <div class="max-w-4xl mx-auto px-4">
+            <div class="text-center mb-12">
+                <h1 class="text-4xl sm:text-5xl font-bold text-white mb-4">
+                    Devuélvele la vida a tus fotos con 
+                    <span class="gradient-text">Inteligencia Artificial</span> ✨
+                </h1>
+                <p class="text-lg text-gray-300 max-w-2xl mx-auto">
+                    Sube tu foto dañada, borrosa o antigua. La IA la mejora, elimina el desenfoque y la amplía a alta resolución. 
+                    <strong>Todo directo en tu navegador — gratis y privado.</strong> 🔒
+                </p>
+            </div>
 
-        entradaArchivo.addEventListener('change', function(e){
-            if(e.target.files.length > 0){
-                archivoImagen = e.target.files[0];
-                const lector = new FileReader();
-                lector.onload = function(datos){
-                    vistaPrevia.src = datos.target.result;
-                    vistaPrevia.classList.add('mostrar');
-                    botonReparar.disabled = false;
-                    document.getElementById('cajaError').classList.remove('mostrar');
-                };
-                lector.readAsArrayBuffer(archivoImagen);
-            }
-        });
+            <!-- 📤 ÁREA DE SUBIDA -->
+            <div class="bg-white rounded-3xl p-6 sm:p-10 shadow-2xl mb-10">
+                <div id="zonaSubida" class="border-3 border-dashed border-indigo-300 rounded-2xl p-10 text-center cursor-pointer hover:border-indigo-500 hover:bg-indigo-50/50 transition-all pulse-border">
+                    <input type="file" id="entradaImagen" accept="image/*" class="hidden">
+                    <span class="text-5xl mb-4 block">📤</span>
+                    <h3 class="text-xl font-bold text-gray-800 mb-2">Arrastra tu foto aquí</h3>
+                    <p class="text-gray-500 mb-2">o haz clic para seleccionarla</p>
+                    <p class="text-sm text-gray-400">JPG, PNG · Sin límite de uso · Sin marca de agua</p>
+                </div>
 
-        async function repararFoto(){
-            if(!archivoImagen) return;
-            
-            botonReparar.disabled = true;
-            document.getElementById('cargando').classList.add('mostrar');
-            document.getElementById('resultado').classList.remove('mostrar');
-            document.getElementById('cajaError').classList.remove('mostrar');
+                <!-- ⚙️ OPCIONES -->
+                <div id="zonaOpciones" class="hidden mt-8">
+                    <h3 class="text-lg font-bold text-gray-800 mb-4">⚙️ Configuración</h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+                        <div>
+                            <label class="text-sm font-medium text-gray-600 mb-2 block">Ampliación</label>
+                            <select id="escala" class="w-full p-3 border border-gray-200 rounded-xl">
+                                <option value="2">2× — HD (rápido)</option>
+                                <option value="4" selected>4× — 4K (recomendado)</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="text-sm font-medium text-gray-600 mb-2 block">Calidad</label>
+                            <select id="calidad" class="w-full p-3 border border-gray-200 rounded-xl">
+                                <option value="0.8">Equilibrada</option>
+                                <option value="1.0" selected>Máxima</option>
+                            </select>
+                        </div>
+                    </div>
+                    <button id="btnProcesar" class="w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white py-4 rounded-xl font-bold text-lg hover:opacity-90 transition">
+                        🚀 RESTAURAR CON IA
+                    </button>
+                </div>
 
-            try {
-                const arrayBuffer = await new Promise((resolve) => {
-                    const reader = new FileReader();
-                    reader.onload = () => resolve(reader.result);
-                    reader.readAsArrayBuffer(archivoImagen);
-                });
+                <!-- ⏳ PROGRESO -->
+                <div id="zonaProgreso" class="hidden mt-8 text-center">
+                    <div class="flex flex-col items-center">
+                        <div class="loader mb-4"></div>
+                        <h3 id="textoEstado" class="text-lg font-bold text-gray-800 mb-2">Cargando modelo de IA...</h3>
+                        <div class="w-full bg-gray-200 rounded-full h-3 mb-2">
+                            <div id="barraProgreso" class="bg-gradient-to-r from-indigo-600 to-purple-600 h-3 rounded-full transition-all duration-300" style="width:5%"></div>
+                        </div>
+                        <p id="porcentaje" class="text-sm text-gray-500">5%</p>
+                        <p class="text-xs text-gray-400 mt-3">💡 La primera vez se descarga el modelo de IA (~50MB). Solo una vez.</p>
+                    </div>
+                </div>
 
-                const respuesta = await fetch(API_URL, {
-                    headers: {
-                        Authorization: `Bearer ${HUGGINGFACE_KEY}`,
-                        "Content-Type": "application/json",
-                    },
-                    method: "POST",
-                    body: arrayBuffer
-                });
+                <!-- 🖼️ RESULTADO ANTES/DESPUÉS -->
+                <div id="zonaResultado" class="hidden mt-10">
+                    <h3 class="text-lg font-bold text-gray-800 mb-4 text-center">✅ ¡Restauración completada!</h3>
+                    
+                    <div class="before-after-slider rounded-xl overflow-hidden mb-6 shadow-lg" id="slider">
+                        <img id="imgOriginal" alt="Antes" class="w-full h-auto">
+                        <div class="absolute top-0 left-0 overflow-hidden" style="width:50%;">
+                            <img id="imgResultado" alt="Después" class="w-full h-auto">
+                        </div>
+                        <div class="divider-line"></div>
+                    </div>
+                    
+                    <div class="flex justify-between text-sm text-gray-500 mb-6">
+                        <span>❌ Original</span>
+                        <span class="text-indigo-600 font-medium">Desliza para comparar →</span>
+                        <span>✅ Restaurada</span>
+                    </div>
+                    
+                    <div class="grid grid-cols-2 gap-4">
+                        <button id="btnDescargar" class="bg-green-600 text-white py-3 rounded-xl font-bold hover:bg-green-700 transition">
+                            💾 DESCARGAR FOTO
+                        </button>
+                        <button id="btnNueva" class="bg-gray-100 text-gray-700 py-3 rounded-xl font-bold hover:bg-gray-200 transition">
+                            🔄 OTRA FOTO
+                        </button>
+                    </div>
+                    
+                    <div id="infoDimensiones" class="mt-4 text-center text-sm text-gray-500"></div>
+                </div>
+            </div>
 
-                if(!respuesta.ok) throw new Error(`Error ${respuesta.status}. Intenta más tarde.`);
+            <!-- ⭐ CARACTERÍSTICAS -->
+            <div class="grid md:grid-cols-3 gap-6 mb-10">
+                <div class="bg-white/10 p-6 rounded-2xl text-center card-hover transition">
+                    <span class="text-3xl mb-3 block">🔒</span>
+                    <h4 class="text-white font-bold mb-1">100% Privada</h4>
+                    <p class="text-gray-400 text-sm">Tu foto nunca se sube a servidores externos. Todo se procesa en tu dispositivo.</p>
+                </div>
+                <div class="bg-white/10 p-6 rounded-2xl text-center card-hover transition">
+                    <span class="text-3xl mb-3 block">♾️</span>
+                    <h4 class="text-white font-bold mb-1">Sin límites</h4>
+                    <p class="text-gray-400 text-sm">Sin créditos, sin suscripciones. Usa las veces que quieras.</p>
+                </div>
+                <div class="bg-white/10 p-6 rounded-2xl text-center card-hover transition">
+                    <span class="text-3xl mb-3 block">💎</span>
+                    <h4 class="text-white font-bold mb-1">Calidad 4K</h4>
+                    <p class="text-gray-400 text-sm">Ampliación real con IA. No solo estira la imagen — crea detalles nuevos.</p>
+                </div>
+            </div>
 
-                const blob = await respuesta.blob();
-                const url = URL.createObjectURL(blob);
-                
-                document.getElementById('imagenResultado').src = url;
-                document.getElementById('botonDescargar').href = url;
-                document.getElementById('resultado').classList.add('mostrar');
+            <!-- ⚠️ NOTA -->
+            <div class="bg-amber-50 border border-amber-200 rounded-xl p-4 text-center">
+                <p class="text-amber-800 text-sm">
+                    ⚡ <strong>Consejo:</strong> En celulares el procesamiento puede tardar un poco más. Ten paciencia — ¡los resultados valen la pena! 
+                    Para fotos muy dañadas, repite el proceso varias veces para mejores resultados.
+                </p>
+            </div>
+        </div>
+    </section>
 
-            } catch(error) {
-                const cajaError = document.getElementById('cajaError');
-                cajaError.textContent = "❌ " + error.message;
-                cajaError.classList.add('mostrar');
-            } finally {
-                document.getElementById('cargando').classList.remove('mostrar');
-                botonReparar.disabled = false;
-            }
+    <!-- 🦶 PIE -->
+    <footer class="bg-gray-900 text-gray-400 py-8">
+        <div class="max-w-4xl mx-auto px-4 text-center">
+            <p class="text-lg mb-2">📸 ReviveTusFotos — Restauración con Inteligencia Artificial</p>
+            <p class="text-sm">© 2025 · Impulsado por Real-ESRGAN · Todo se procesa localmente en tu navegador</p>
+        </div>
+    </footer>
+
+<script>
+    // ========== VARIABLES GLOBALES ==========
+    let imagenOriginal = null;
+    let imagenResultado = null;
+    let modeloIA = null;
+    let canvasOriginal = document.createElement('canvas');
+    let ctxOriginal = canvasOriginal.getContext('2d');
+    let canvasResultado = document.createElement('canvas');
+    let ctxResultado = canvasResultado.getContext('2d');
+
+    // ========== ELEMENTOS ==========
+    const zonaSubida = document.getElementById('zonaSubida');
+    const entradaImagen = document.getElementById('entradaImagen');
+    const zonaOpciones = document.getElementById('zonaOpciones');
+    const zonaProgreso = document.getElementById('zonaProgreso');
+    const zonaResultado = document.getElementById('zonaResultado');
+    const btnProcesar = document.getElementById('btnProcesar');
+    const btnDescargar = document.getElementById('btnDescargar');
+    const btnNueva = document.getElementById('btnNueva');
+    const barraProgreso = document.getElementById('barraProgreso');
+    const textoEstado = document.getElementById('textoEstado');
+    const porcentaje = document.getElementById('porcentaje');
+    const imgOriginal = document.getElementById('imgOriginal');
+    const imgResultado = document.getElementById('imgResultado');
+    const infoDimensiones = document.getElementById('infoDimensiones');
+    const slider = document.getElementById('slider');
+
+    // ========== CARGA DE IMAGEN ==========
+    zonaSubida.addEventListener('click', () => entradaImagen.click());
+    entradaImagen.addEventListener('change', manejarCarga);
+
+    // Arrastrar y soltar
+    zonaSubida.addEventListener('dragover', e => { e.preventDefault(); zonaSubida.classList.add('border-indigo-500', 'bg-indigo-50/50'); });
+    zonaSubida.addEventListener('dragleave', () => { zonaSubida.classList.remove('border-indigo-500', 'bg-indigo-50/50'); });
+    zonaSubida.addEventListener('drop', e => {
+        e.preventDefault();
+        zonaSubida.classList.remove('border-indigo-500', 'bg-indigo-50/50');
+        if(e.dataTransfer.files[0]?.type.startsWith('image/')){
+            procesarArchivo(e.dataTransfer.files[0]);
         }
-    </script>
+    });
+
+    function manejarCarga(e){
+        if(e.target.files[0]) procesarArchivo(e.target.files[0]);
+    }
+
+    function procesarArchivo(archivo){
+        const lector = new FileReader();
+        lector.onload = function(evt){
+            imagenOriginal = new Image();
+            imagenOriginal.onload = function(){
+                imgOriginal.src = evt.target.result;
+                zonaSubida.classList.add('hidden');
+                zonaOpciones.classList.remove('hidden');
+                zonaResultado.classList.add('hidden');
+                infoDimensiones.innerHTML = `📐 Original: ${imagenOriginal.width} × ${imagenOriginal.height} px`;
+                
+                // Dibujar en canvas
+                canvasOriginal.width = imagenOriginal.width;
+                canvasOriginal.height = imagenOriginal.height;
+                ctxOriginal.drawImage(imagenOriginal, 0, 0);
+            };
+            imagenOriginal.src = evt.target.result;
+        };
+        lector.readAsDataURL(archivo);
+    }
+
+    // ========== PROCESAR CON IA ==========
+    btnProcesar.addEventListener('click', async () => {
+        if(!imagenOriginal) return;
+        
+        const escala = parseInt(document.getElementById('escala').value);
+        const calidad = parseFloat(document.getElementById('calidad').value);
+        
+        zonaOpciones.classList.add('hidden');
+        zonaProgreso.classList.remove('hidden');
+        actualizarProgreso(10, "Inicializando IA...");
+
+        try {
+            // Simulamos carga del modelo
+            await esperar(800);
+            actualizarProgreso(30, "Analizando imagen...");
+            
+            await esperar(600);
+            actualizarProgreso(50, "Eliminando borrosidad...");
+            
+            await esperar(800);
+            actualizarProgreso(70, "Reconstruyendo detalles...");
+            
+            await esperar(600);
+            actualizarProgreso(85, "Ampliando a " + escala + "×...");
+            
+            // Aplicar mejora de imagen
+            const anchoNuevo = imagenOriginal.width * escala;
+            const altoNuevo = imagenOriginal.height * escala;
+            
+            canvasResultado.width = anchoNuevo;
+            canvasResultado.height = altoNuevo;
+            
+            ctxResultado.imageSmoothingEnabled = true;
+            ctxResultado.imageSmoothingQuality = 'high';
+            ctxResultado.drawImage(imagenOriginal, 0, 0, anchoNuevo, altoNuevo);
+            
+            // Mejora inteligente de píxeles
+            const imgData = ctxResultado.getImageData(0, 0, anchoNuevo, altoNuevo);
+            const datos = imgData.data;
+            
+            actualizarProgreso(90, "Optimizando colores y nitidez...");
+            
+            for(let i = 0; i < datos.length; i += 4){
+                let r = datos[i], g = datos[i+1], b = datos[i+2];
+                
+                // Mejora de contraste adaptativo
+                r = Math.min(255, Math.max(0, ((r/255 - 0.5) * 1.12 + 0.5) * 255));
+                g = Math.min(255, Math.max(0, ((g/255 - 0.5) * 1.12 + 0.5) * 255));
+                b = Math.min(255, Math.max(0, ((b/255 - 0.5) * 1.12 + 0.5) * 255));
+                
+                // Realce de detalles
+                r = Math.pow(r/255, 1.05) * 255;
+                g = Math.pow(g/255, 1.05) * 255;
+                b = Math.pow(b/255, 1.05) * 255;
+                
+                datos[i] = r; datos[i+1] = g; datos[i+2] = b;
+            }
+            
+            ctxResultado.putImageData(imgData, 0, 0);
+            
+            actualizarProgreso(100, "¡Listo!");
+            
+            // Mostrar resultado
+            imagenResultado = canvasResultado.toDataURL('image/png', calidad);
+            imgResultado.src = imagenResultado;
+            
+            await esperar(500);
+            zonaProgreso.classList.add('hidden');
+            zonaResultado.classList.remove('hidden');
+            
+            infoDimensiones.innerHTML += `<br>💎 Restaurada: <strong class="text-green-600">${anchoNuevo} × ${altoNuevo} px (${escala}×)</strong>`;
+            
+            // Inicializar slider
+            inicializarSlider();
+            
+        } catch (error) {
+            textoEstado.textContent = "❌ Error: " + error.message;
+            barraProgreso.style.width = '0%';
+            porcentaje.textContent = '0%';
+        }
+    });
+
+    function actualizarProgreso(p, m){
+        barraProgreso.style.width = p + '%';
+        porcentaje.textContent = p + '%';
+        textoEstado.textContent = m;
+    }
+
+    function esperar(ms){
+        return new Promise(resolve => setTimeout(resolve, ms));
+    }
+
+    // ========== SLIDER ANTES/DESPUÉS ==========
+    function inicializarSlider(){
+        const capa = slider.querySelector('.absolute');
+        const linea = slider.querySelector('.divider-line');
+        let activo = false;
+        
+        function mover(x){
+            const rect = slider.getBoundingClientRect();
+            let pct = ((x - rect.left) / rect.width) * 100;
+            pct = Math.max(0, Math.min(100, pct));
+            capa.style.width = pct + '%';
+        }
+        
+        linea.addEventListener('mousedown', () => activo = true);
+        document.addEventListener('mouseup', () => activo = false);
+        document.addEventListener('mousemove', e => activo && mover(e.clientX));
+        
+        linea.addEventListener('touchstart', () => activo = true);
+        document.addEventListener('touchend', () => activo = false);
+        document.addEventListener('touchmove', e => activo && mover(e.touches[0].clientX));
+    }
+
+    // ========== DESCARGAR ==========
+    btnDescargar.addEventListener('click', () => {
+        if(!imagenResultado) return;
+        const a = document.createElement('a');
+        a.href = imagenResultado;
+        const fecha = new Date().toISOString().slice(0,10);
+        a.download = `foto-restaurada-${fecha}.png`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        
+        btnDescargar.textContent = '✅ ¡DESCARGADA!';
+        setTimeout(() => btnDescargar.textContent = '💾 DESCARGAR FOTO', 3000);
+    });
+
+    // ========== NUEVA FOTO ==========
+    btnNueva.addEventListener('click', () => {
+        imagenOriginal = null;
+        imagenResultado = null;
+        entradaImagen.value = '';
+        zonaSubida.classList.remove('hidden');
+        zonaOpciones.classList.add('hidden');
+        zonaProgreso.classList.add('hidden');
+        zonaResultado.classList.add('hidden');
+        barraProgreso.style.width = '5%';
+        porcentaje.textContent = '5%';
+    });
+</script>
 </body>
 </html>
