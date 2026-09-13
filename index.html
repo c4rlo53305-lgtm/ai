@@ -861,4 +861,213 @@ function onMove(e){
       G.targetZoom += (G.lastPinchDist - dist)*0.07;
       G.targetZoom = Math.max(ZOOM_MIN, Math.min(ZOOM_MAX, G.targetZoom));
     }
-    G.lastPinchDist
+    G.lastPinchDist = dist;
+    G.tapStart = null;
+  }
+  e.preventDefault();
+}
+function onUp(e){
+  var cv = G.renderer.domElement;
+  if (cv.releasePointerCapture){ try { cv.releasePointerCapture(e.pointerId); } catch(_){} }
+  if (G.pointers.size === 1 && G.tapStart){
+    var dt = performance.now() - G.tapStart.t;
+    var dx = e.clientX - G.tapStart.x, dy = e.clientY - G.tapStart.y;
+    if (dt < 400 && Math.sqrt(dx*dx+dy*dy) < 12) tryPhotoClick(e.clientX, e.clientY);
+    G.tapStart = null;
+  }
+  G.pointers.delete(e.pointerId);
+  if (G.pointers.size < 2) G.lastPinchDist = null;
+  if (G.pointers.size === 0) G.tapStart = null;
+  e.preventDefault();
+}
+function onWheel(e){
+  e.preventDefault();
+  G.targetZoom += e.deltaY*0.02;
+  G.targetZoom = Math.max(ZOOM_MIN, Math.min(ZOOM_MAX, G.targetZoom));
+}
+function tryPhotoClick(cx, cy){
+  if (!G.photoSprites.length) return;
+  G.tmpNdc.x = (cx/innerWidth)*2 - 1;
+  G.tmpNdc.y = -(cy/innerHeight)*2 + 1;
+  G.raycaster.setFromCamera(G.tmpNdc, G.camera);
+  G.raycaster.params.Sprite = { threshold: 0.3 };
+  var hits = G.raycaster.intersectObjects(G.photoSprites);
+  if (hits.length) zoomToPhoto(hits[0].object);
+}
+function zoomToPhoto(sprite){
+  if (G.zoomState) return;
+  var wp = sprite.position.clone().applyMatrix4(G.spriteContainer.matrixWorld);
+  var dir = G.camera.position.clone().sub(wp).normalize();
+  var dist = (sprite.userData.baseScale || 2) * 1.7;
+  G.zoomState = {
+    camA: G.camera.position.clone(),
+    camB: wp.clone().add(dir.multiplyScalar(dist)),
+    lookA: new THREE.Vector3(0,0,0),
+    lookB: wp.clone(),
+    t0: performance.now(),
+    dur: G.isMobile ? 1150 : 1350,
+    onDone: function(){
+      $("modal-img").src = sprite.userData.url;
+      var d = (sprite.userData.desc || "").trim();
+      if (d){ $("modal-desc").textContent = d; $("modal-desc").classList.add("show"); }
+      else { $("modal-desc").textContent = ""; $("modal-desc").classList.remove("show"); }
+      $("modal-msg").textContent = G.message;
+      $("modal").classList.add("show");
+    }
+  };
+}
+function zoomOutFromModal(){
+  if (G.zoomState) return;
+  G.zoomState = {
+    camA: G.camera.position.clone(),
+    camB: new THREE.Vector3(0, 6, G.targetZoom),
+    lookA: new THREE.Vector3(0,0,0),
+    lookB: new THREE.Vector3(0,0,0),
+    t0: performance.now(),
+    dur: G.isMobile ? 900 : 1100
+  };
+}
+
+function animate(){
+  requestAnimationFrame(animate);
+  if (!G.renderer || !G.composer) return;
+  var t = G.clock.getElapsedTime();
+  var dt = Math.min(0.05, t - G.lastFrame);
+  G.lastFrame = t;
+  G.uBg.uTime.value = t;
+  G.uGal.uTime.value = t;
+
+  if (G.zoomState){
+    var p = Math.min((performance.now() - G.zoomState.t0) / G.zoomState.dur, 1);
+    var e = easeInOutCubic(p);
+    G.camera.position.lerpVectors(G.zoomState.camA, G.zoomState.camB, e);
+    var lx = G.zoomState.lookA.x + (G.zoomState.lookB.x - G.zoomState.lookA.x)*e;
+    var ly = G.zoomState.lookA.y + (G.zoomState.lookB.y - G.zoomState.lookA.y)*e;
+    var lz = G.zoomState.lookA.z + (G.zoomState.lookB.z - G.zoomState.lookA.z)*e;
+    G.camera.lookAt(lx, ly, lz);
+    if (p >= 1){ var done = G.zoomState; G.zoomState = null; if (done.onDone) done.onDone(); }
+  } else {
+    if (G.pointers.size === 0){
+      G.rotation.x += G.rotationVel.x;
+      G.rotation.y += G.rotationVel.y + AUTO_ROT;
+      G.rotationVel.x *= 0.94; G.rotationVel.y *= 0.94;
+      G.rotation.x = Math.max(-ROT_LIMIT_X, Math.min(ROT_LIMIT_X, G.rotation.x));
+      if (Math.abs(G.rotationVel.x) < 0.0001) G.rotationVel.x = 0;
+      if (Math.abs(G.rotationVel.y) < 0.0001) G.rotationVel.y = 0;
+    } else {
+      G.rotation.y += AUTO_ROT*0.5;
+    }
+    G.currentZoom += (G.targetZoom - G.currentZoom)*0.12;
+    if (G.worldGroup){
+      G.worldGroup.rotation.x = G.rotation.x;
+      G.worldGroup.rotation.y = G.rotation.y;
+    }
+    if (G.bgStars){
+      G.bgStars.rotation.y = -G.rotation.y*0.1 - t*0.004;
+      G.bgStars.rotation.x = G.rotation.x*0.06;
+    }
+    G.camera.position.set(0, 6, G.currentZoom);
+    G.camera.lookAt(0, 0, 0);
+  }
+
+  for (var i=0;i<G.photoSprites.length;i++){
+    var s = G.photoSprites[i];
+    if (s.userData.baseY !== undefined) s.position.y = s.userData.baseY + Math.sin(t*0.8 + s.userData.phase)*0.35;
+  }
+  for (var j=0;j<G.phraseSprites.length;j++){
+    var s2 = G.phraseSprites[j];
+    if (s2.userData.baseY !== undefined) s2.position.y = s2.userData.baseY + Math.sin(t*s2.userData.floatSpeed + s2.userData.phase)*0.5;
+  }
+
+  updateShootingStars(dt);
+
+  if (!G.isMobile && G.photoSprites.length && G.isStarted && !G.zoomState){
+    G.tmpNdc.x = (G.lastPtr.x/innerWidth)*2 - 1;
+    G.tmpNdc.y = -(G.lastPtr.y/innerHeight)*2 + 1;
+    G.raycaster.setFromCamera(G.tmpNdc, G.camera);
+    G.raycaster.params.Sprite = { threshold: 0.2 };
+    var hits = G.raycaster.intersectObjects(G.photoSprites);
+    G.hoveredPhoto = hits.length ? hits[0].object : null;
+    for (var k=0;k<G.photoSprites.length;k++){
+      var s3 = G.photoSprites[k];
+      var base = s3.userData.baseScale || 2;
+      var tgt = s3 === G.hoveredPhoto ? base*1.18 : base;
+      var nxt = s3.scale.x + (tgt - s3.scale.x)*0.15;
+      s3.scale.set(nxt, nxt, 1);
+    }
+    G.renderer.domElement.style.cursor = G.hoveredPhoto ? "pointer" : "grab";
+  }
+
+  G.composer.render();
+}
+
+var startHandled = false;
+function onStartClick(){
+  if (startHandled) return;
+  startHandled = true;
+  setTimeout(function(){ startHandled = false; }, 800);
+  $("start").classList.add("hidden");
+  $("hint").classList.add("show");
+  G.isStarted = true;
+  setTimeout(function(){
+    if (G.photos.length > 0){
+      setTimeout(function(){
+        var first = G.photos[0];
+        $("modal-img").src = first.url;
+        var d = (first.desc || "").trim();
+        if (d){ $("modal-desc").textContent = d; $("modal-desc").classList.add("show"); }
+        else { $("modal-desc").textContent = ""; $("modal-desc").classList.remove("show"); }
+        $("modal-msg").textContent = G.message;
+        $("modal").classList.add("show");
+      }, 900);
+    }
+  }, 1500);
+}
+
+function initGalaxyEvents(){
+  $("start-btn").addEventListener("pointerdown", function(e){
+    if (e.pointerType === "mouse" && e.button !== 0) return;
+    e.preventDefault();
+    onStartClick();
+  });
+  $("start-btn").addEventListener("click", function(e){
+    e.preventDefault();
+    onStartClick();
+  });
+  function closeModal(){
+    $("modal").classList.remove("show");
+    if (G.isStarted) zoomOutFromModal();
+  }
+  $("modal-close").addEventListener("click", function(e){ e.stopPropagation(); closeModal(); });
+  $("modal").addEventListener("click", function(e){ if (e.target === $("modal")) closeModal(); });
+}
+
+/* ============================================================
+   BOOT
+   ============================================================ */
+window.addEventListener("DOMContentLoaded", function(){
+  if (isViewerMode()){
+    // Modo galaxia: carga datos del hash
+    $("editor").classList.add("hidden");
+    $("galaxy").classList.add("show");
+    try {
+      var data = unpackData(location.hash.slice(1));
+      initGalaxy(data);
+      initGalaxyEvents();
+    } catch(err){
+      console.error(err);
+      document.body.innerHTML =
+        '<div style="padding:40px;text-align:center;font-family:sans-serif;color:#fff">' +
+        '<h1>Link inválido</h1>' +
+        '<p style="color:#87CEEB;margin-top:10px">El enlace parece estar roto o incompleto.</p>' +
+        '<a href="' + location.pathname + '" style="color:#00d4ff;margin-top:20px;display:inline-block">Crear uno nuevo</a>' +
+        '</div>';
+    }
+  } else {
+    // Modo editor
+    initEditor();
+  }
+});
+</script>
+</body>
+</html>
