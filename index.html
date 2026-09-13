@@ -170,12 +170,13 @@
 <script>
     // 🔑 TU CLAVE DE API DE REPLICATE
     const API_TOKEN = "r8_HFAK4m8qbEpO6FRk6RvtB8ZS3louo6T";
-    const API_URL = "https://api.replicate.com/v1/predictions";
+    // ✅ YA CON EL PROXY PARA EVITAR EL ERROR DE CORS
+    const API_URL = "https://corsproxy.io/?https://api.replicate.com/v1/predictions";
 
     // 📦 MODELOS
     const MODELOS = {
         deoldify: {
-            version: "jrware/deoldify:25810c652893f3c4ac1b88f1c640b8c9a461210601c139d03c2a748278b623f7",
+            version: "jrware/deoldify:25810c652893f3c4ac1b88f1c640b8c9a461210601c139d03c2a748278b6",
             input: (img) => ({ image: img, render_factor: 35 })
         },
         gfpgan: {
@@ -318,74 +319,74 @@
             }
             
             if(!resultado){
-                throw new Error('Tiempo de espera agotado. Intenta de nuevo.');
-            }
-
-            // Paso 3: Mostrar resultado
-            actualizarProgreso(100, "¡Completado!");
-            resultadoUrl = Array.isArray(resultado) ? resultado[0] : resultado;
-            
-            imgOriginal.src = imagenBase64;
-            imgResultado.src = resultadoUrl;
-            
-            await esperar(500);
-            zonaProgreso.classList.add('hidden');
-            zonaResultado.classList.remove('hidden');
-            
-        } catch (error) {
-            alert('❌ Error: ' + error.message);
-            zonaProgreso.classList.add('hidden');
-            zonaPreview.classList.remove('hidden');
+            throw new Error('Tiempo de espera agotado. Intenta de nuevo.');
         }
-    }
 
-    function actualizarProgreso(p, m){
-        barraProgreso.style.width = p + '%';
-        porcentaje.textContent = p + '%';
-        textoEstado.textContent = m;
-    }
-
-    function esperar(ms){
-        return new Promise(resolve => setTimeout(resolve, ms));
-    }
-
-    // ========== DESCARGAR ==========
-    btnDescargar.addEventListener('click', async () => {
-        if(!resultadoUrl) return;
+        // Paso 3: Mostrar resultado
+        actualizarProgreso(100, "¡Completado!");
+        resultadoUrl = Array.isArray(resultado) ? resultado[0] : resultado;
         
-        try {
-            const respuesta = await fetch(resultadoUrl);
-            const blob = await respuesta.blob();
-            const url = window.URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            const fecha = new Date().toISOString().slice(0,10);
-            a.download = `foto-${tareaSeleccionada}-${fecha}.png`;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            window.URL.revokeObjectURL(url);
-            
-            btnDescargar.textContent = '✅ ¡DESCARGADA!';
-            setTimeout(() => btnDescargar.textContent = '💾 DESCARGAR FOTO', 3000);
-        } catch {
-            window.open(resultadoUrl, '_blank');
-        }
-    });
-
-    // ========== NUEVA FOTO ==========
-    btnNueva.addEventListener('click', () => {
-        imagenBase64 = null;
-        tareaSeleccionada = null;
-        resultadoUrl = null;
-        entradaImagen.value = '';
-        zonaSubida.classList.remove('hidden');
-        zonaPreview.classList.add('hidden');
+        imgOriginal.src = imagenBase64;
+        imgResultado.src = resultadoUrl;
+        
+        await esperar(500);
         zonaProgreso.classList.add('hidden');
-        zonaResultado.classList.add('hidden');
-        barraProgreso.style.width = '5%';
-        porcentaje.textContent = '5%';
-    });
+        zonaResultado.classList.remove('hidden');
+        
+    } catch (error) {
+        alert('❌ Error: ' + error.message);
+        zonaProgreso.classList.add('hidden');
+        zonaPreview.classList.remove('hidden');
+    }
+}
+
+function actualizarProgreso(p, m){
+    barraProgreso.style.width = p + '%';
+    porcentaje.textContent = p + '%';
+    textoEstado.textContent = m;
+}
+
+function esperar(ms){
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+// ========== DESCARGAR ==========
+btnDescargar.addEventListener('click', async () => {
+    if(!resultadoUrl) return;
+    
+    try {
+        const respuesta = await fetch(resultadoUrl);
+        const blob = await respuesta.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        const fecha = new Date().toISOString().slice(0,10);
+        a.download = `foto-${tareaSeleccionada}-${fecha}.png`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        window.URL.revokeObjectURL(url);
+        
+        btnDescargar.textContent = '✅ ¡DESCARGADA!';
+        setTimeout(() => btnDescargar.textContent = '💾 DESCARGAR FOTO', 3000);
+    } catch {
+        window.open(resultadoUrl, '_blank');
+    }
+});
+
+// ========== NUEVA FOTO ==========
+btnNueva.addEventListener('click', () => {
+    imagenBase64 = null;
+    tareaSeleccionada = null;
+    resultadoUrl = null;
+    entradaImagen.value = '';
+    zonaSubida.classList.remove('hidden');
+    zonaPreview.classList.add('hidden');
+    zonaProgreso.classList.add('hidden');
+    zonaResultado.classList.add('hidden');
+    barraProgreso.style.width = '5%';
+    porcentaje.textContent = '5%';
+});
 </script>
 </body>
 </html>
