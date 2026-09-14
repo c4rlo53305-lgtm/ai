@@ -31,6 +31,8 @@ html,body{width:100%;min-height:100dvh;background:radial-gradient(ellipse at top
 .file-drop.has-file{border-style:solid;border-color:#22c55e;background:rgba(34,197,94,.1);color:#86efac}
 .file-drop.premium{border-color:rgba(255,209,102,.5);background:rgba(255,209,102,.06);color:#ffd166}
 .file-drop.premium::after{content:'🔒';position:absolute;top:6px;right:10px;font-size:14px;opacity:.8}
+.file-drop.premium.unlocked{border-color:rgba(34,197,94,.5);background:rgba(34,197,94,.06);color:#86efac}
+.file-drop.premium.unlocked::after{content:'✓';color:#4ade80;opacity:1}
 #photo-list{display:flex;flex-direction:column;gap:10px;margin-top:10px}
 .photo-block{background:rgba(0,0,0,.3);border:1px solid rgba(0,191,255,.2);border-radius:12px;padding:10px;display:flex;gap:10px;align-items:flex-start}
 .thumb{position:relative;width:70px;height:70px;flex-shrink:0;border-radius:9px;overflow:hidden;background:#000;border:1px solid rgba(0,191,255,.35)}
@@ -54,7 +56,6 @@ html,body{width:100%;min-height:100dvh;background:radial-gradient(ellipse at top
 .btn-primary{background:linear-gradient(135deg,#22c55e,#16a34a);color:#fff;box-shadow:0 10px 30px rgba(34,197,94,.4)}
 .btn-ghost{background:linear-gradient(135deg,#00d4ff,#7b2ff7);color:#fff;box-shadow:0 10px 30px rgba(0,212,255,.4)}
 .btn-wa{background:linear-gradient(135deg,#25D366,#128C7E);color:#fff;box-shadow:0 10px 30px rgba(37,211,102,.4)}
-.btn-premium{background:linear-gradient(135deg,#ffd166,#ffa000);color:#1a0e00;box-shadow:0 10px 30px rgba(255,180,40,.4)}
 #qr-area{display:none;margin-top:16px;margin-bottom:8px;padding:18px;background:rgba(0,212,255,.08);border:1px solid rgba(0,212,255,.35);border-radius:14px;text-align:center;scroll-margin-bottom:140px}
 #qr-area.show{display:block;animation:pop .4s}
 @keyframes pop{from{transform:scale(.9);opacity:0}to{transform:scale(1);opacity:1}}
@@ -69,76 +70,21 @@ html,body{width:100%;min-height:100dvh;background:radial-gradient(ellipse at top
 #loading.show{display:flex}
 .spinner{width:44px;height:44px;border:4px solid rgba(0,212,255,.2);border-top-color:#00d4ff;border-radius:50%;animation:spin 1s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
-
-/* Barra inferior */
-.fixed-bar{
-  position:fixed;bottom:0;left:0;right:0;z-index:900;
-  padding:12px 18px calc(12px + env(safe-area-inset-bottom,0));
-  background:linear-gradient(180deg,rgba(0,3,8,0),rgba(0,3,8,.96) 35%);
-  display:flex;gap:10px;max-width:560px;margin:0 auto;
-  pointer-events:none;
-}
+.fixed-bar{position:fixed;bottom:0;left:0;right:0;z-index:900;padding:12px 18px calc(12px + env(safe-area-inset-bottom,0));background:linear-gradient(180deg,rgba(0,3,8,0),rgba(0,3,8,.96) 35%);display:flex;gap:10px;max-width:560px;margin:0 auto;pointer-events:none}
 .fixed-bar .btn{margin:0;flex:1;pointer-events:auto}
-
-/* Botón flotante de compartir con logo WhatsApp */
-#share-float{
-  position:fixed;
-  bottom:calc(96px + env(safe-area-inset-bottom,0));
-  right:16px;
-  z-index:950;
-  width:54px;height:54px;border-radius:50%;
-  background:linear-gradient(135deg,#25D366,#128C7E);
-  color:#fff;border:none;
-  display:flex;align-items:center;justify-content:center;
-  cursor:pointer;touch-action:manipulation;
-  box-shadow:0 10px 30px rgba(37,211,102,.55),0 4px 10px rgba(0,0,0,.5);
-  transition:transform .2s ease,box-shadow .2s ease;
-}
+#share-float{position:fixed;bottom:calc(96px + env(safe-area-inset-bottom,0));right:16px;z-index:950;width:54px;height:54px;border-radius:50%;background:linear-gradient(135deg,#25D366,#128C7E);color:#fff;border:none;display:flex;align-items:center;justify-content:center;cursor:pointer;touch-action:manipulation;box-shadow:0 10px 30px rgba(37,211,102,.55),0 4px 10px rgba(0,0,0,.5);transition:transform .2s ease,box-shadow .2s ease}
 #share-float svg{width:32px;height:32px;fill:#fff}
 #share-float:active{transform:scale(.92)}
-#share-float:hover{box-shadow:0 12px 40px rgba(37,211,102,.75),0 4px 10px rgba(0,0,0,.5)}
-
-/* Menú compartir */
-#share-menu{
-  position:fixed;inset:0;z-index:990;
-  background:rgba(0,0,0,.7);backdrop-filter:blur(8px);
-  display:none;align-items:flex-end;justify-content:center;
-  padding:20px;
-}
+#share-menu{position:fixed;inset:0;z-index:990;background:rgba(0,0,0,.7);backdrop-filter:blur(8px);display:none;align-items:flex-end;justify-content:center;padding:20px}
 #share-menu.show{display:flex;animation:fadeIn .25s}
-#share-menu-box{
-  width:100%;max-width:440px;
-  background:linear-gradient(160deg,rgba(13,29,49,.98),rgba(12,13,19,.98));
-  border:1px solid rgba(0,191,255,.35);
-  border-radius:20px;
-  padding:22px 20px calc(20px + env(safe-area-inset-bottom,0));
-  animation:slideUp .3s cubic-bezier(.2,.9,.3,1.1);
-  box-shadow:0 0 60px rgba(0,191,255,.35);
-}
+#share-menu-box{width:100%;max-width:440px;background:linear-gradient(160deg,rgba(13,29,49,.98),rgba(12,13,19,.98));border:1px solid rgba(0,191,255,.35);border-radius:20px;padding:22px 20px calc(20px + env(safe-area-inset-bottom,0));animation:slideUp .3s cubic-bezier(.2,.9,.3,1.1);box-shadow:0 0 60px rgba(0,191,255,.35)}
 @keyframes slideUp{from{transform:translateY(30px);opacity:0}to{transform:translateY(0);opacity:1}}
-#share-menu h3{
-  font-size:1rem;font-weight:700;margin-bottom:6px;color:#fff;
-  display:flex;justify-content:space-between;align-items:center;
-}
-#share-menu h3 button{
-  background:transparent;border:none;color:#7f9dbf;font-size:22px;
-  cursor:pointer;padding:0 4px;line-height:1;
-}
+#share-menu h3{font-size:1rem;font-weight:700;margin-bottom:6px;color:#fff;display:flex;justify-content:space-between;align-items:center}
+#share-menu h3 button{background:transparent;border:none;color:#7f9dbf;font-size:22px;cursor:pointer;padding:0 4px;line-height:1}
 #share-menu p{font-size:.78rem;color:#7f9dbf;margin-bottom:16px}
-.share-opt{
-  display:flex;align-items:center;gap:12px;
-  padding:13px 14px;border-radius:12px;
-  background:rgba(0,0,0,.35);border:1px solid rgba(0,191,255,.15);
-  cursor:pointer;transition:all .2s;margin-bottom:9px;
-  color:#e6f0ff;font-size:.9rem;font-weight:500;
-  text-decoration:none;font-family:inherit;width:100%;text-align:left;
-}
+.share-opt{display:flex;align-items:center;gap:12px;padding:13px 14px;border-radius:12px;background:rgba(0,0,0,.35);border:1px solid rgba(0,191,255,.15);cursor:pointer;transition:all .2s;margin-bottom:9px;color:#e6f0ff;font-size:.9rem;font-weight:500;text-decoration:none;font-family:inherit;width:100%;text-align:left}
 .share-opt:hover{background:rgba(0,212,255,.12);border-color:rgba(0,212,255,.5)}
-.share-opt .ico{
-  width:36px;height:36px;border-radius:10px;
-  display:flex;align-items:center;justify-content:center;
-  font-size:18px;flex-shrink:0;
-}
+.share-opt .ico{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
 .share-wa .ico{background:linear-gradient(135deg,#25D366,#128C7E);color:#fff}
 .share-wa .ico svg{width:22px;height:22px;fill:#fff}
 .share-copy .ico{background:linear-gradient(135deg,#00d4ff,#7b2ff7);color:#fff}
@@ -146,87 +92,24 @@ html,body{width:100%;min-height:100dvh;background:radial-gradient(ellipse at top
 .share-opt .txt{flex:1;min-width:0}
 .share-opt .txt b{display:block;font-weight:600;color:#fff;margin-bottom:2px}
 .share-opt .txt span{font-size:.75rem;color:#7f9dbf}
-
-/* Modal Premium */
-#premium-modal{
-  position:fixed;inset:0;z-index:1200;
-  background:rgba(0,0,0,.85);backdrop-filter:blur(10px);
-  display:none;align-items:center;justify-content:center;
-  padding:20px;
-}
+#premium-modal{position:fixed;inset:0;z-index:1200;background:rgba(0,0,0,.85);backdrop-filter:blur(10px);display:none;align-items:center;justify-content:center;padding:20px}
 #premium-modal.show{display:flex;animation:fadeIn .3s}
-#premium-box{
-  width:100%;max-width:400px;
-  background:linear-gradient(160deg,#1a1207,#0a0a15);
-  border:2px solid rgba(255,209,102,.5);
-  border-radius:22px;
-  padding:28px 24px;
-  text-align:center;
-  animation:pop .4s cubic-bezier(.2,.9,.3,1.2);
-  box-shadow:0 0 80px rgba(255,180,40,.35),0 0 20px rgba(255,209,102,.2);
-  position:relative;
-  overflow:hidden;
-}
-#premium-box::before{
-  content:'';position:absolute;inset:0;
-  background:radial-gradient(circle at top,rgba(255,209,102,.2),transparent 60%);
-  pointer-events:none;
-}
-#premium-box .crown{
-  font-size:52px;margin-bottom:10px;
-  filter:drop-shadow(0 0 20px rgba(255,209,102,.7));
-  animation:crownFloat 2s ease-in-out infinite;
-  position:relative;
-}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+#premium-box{width:100%;max-width:400px;background:linear-gradient(160deg,#1a1207,#0a0a15);border:2px solid rgba(255,209,102,.5);border-radius:22px;padding:28px 24px;text-align:center;animation:pop .4s cubic-bezier(.2,.9,.3,1.2);box-shadow:0 0 80px rgba(255,180,40,.35),0 0 20px rgba(255,209,102,.2);position:relative;overflow:hidden}
+#premium-box::before{content:'';position:absolute;inset:0;background:radial-gradient(circle at top,rgba(255,209,102,.2),transparent 60%);pointer-events:none}
+#premium-box .crown{font-size:52px;margin-bottom:10px;filter:drop-shadow(0 0 20px rgba(255,209,102,.7));animation:crownFloat 2s ease-in-out infinite;position:relative}
 @keyframes crownFloat{0%,100%{transform:translateY(0) rotate(-4deg)}50%{transform:translateY(-6px) rotate(4deg)}}
-#premium-box h2{
-  font-family:'Pacifico',cursive;
-  font-size:1.6rem;
-  background:linear-gradient(90deg,#ffd166,#ffa000,#ffd166);
-  background-size:200% 100%;
-  -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
-  animation:shimmer 3s infinite;
-  margin-bottom:8px;position:relative;
-}
+#premium-box h2{font-family:'Pacifico',cursive;font-size:1.6rem;background:linear-gradient(90deg,#ffd166,#ffa000,#ffd166);background-size:200% 100%;-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;animation:shimmer 3s infinite;margin-bottom:8px;position:relative}
 @keyframes shimmer{0%{background-position:0% 50%}100%{background-position:200% 50%}}
 #premium-box .subtitle{font-size:.85rem;color:#c9a76a;margin-bottom:20px;position:relative}
-#premium-box .feature{
-  background:rgba(255,209,102,.1);
-  border:1px solid rgba(255,209,102,.3);
-  border-radius:12px;
-  padding:12px 16px;
-  font-size:.88rem;color:#ffe8b3;
-  margin-bottom:18px;text-align:left;position:relative;
-}
+#premium-box .feature{background:rgba(255,209,102,.1);border:1px solid rgba(255,209,102,.3);border-radius:12px;padding:12px 16px;font-size:.88rem;color:#ffe8b3;margin-bottom:18px;text-align:left;position:relative}
 #premium-box .feature b{color:#ffd166}
-#premium-box .price{
-  font-family:'Permanent Marker',cursive;
-  font-size:2rem;color:#ffd166;margin-bottom:6px;
-  text-shadow:0 0 20px rgba(255,209,102,.5);position:relative;
-}
+#premium-box .price{font-family:'Permanent Marker',cursive;font-size:2rem;color:#ffd166;margin-bottom:6px;text-shadow:0 0 20px rgba(255,209,102,.5);position:relative}
 #premium-box .price-note{font-size:.72rem;color:#8a7a5a;margin-bottom:20px;position:relative}
-#premium-box .btn-upgrade{
-  background:linear-gradient(135deg,#ffd166,#ffa000);
-  color:#1a0e00;font-weight:800;
-  padding:14px;border-radius:12px;
-  border:none;width:100%;cursor:pointer;
-  font-family:inherit;font-size:1rem;
-  box-shadow:0 10px 30px rgba(255,180,40,.5);
-  margin-bottom:10px;position:relative;
-  transition:transform .2s;
-}
+#premium-box .btn-upgrade{background:linear-gradient(135deg,#ffd166,#ffa000);color:#1a0e00;font-weight:800;padding:14px;border-radius:12px;border:none;width:100%;cursor:pointer;font-family:inherit;font-size:1rem;box-shadow:0 10px 30px rgba(255,180,40,.5);margin-bottom:10px;position:relative;transition:transform .2s}
 #premium-box .btn-upgrade:active{transform:scale(.97)}
-#premium-box .btn-later{
-  background:transparent;border:1px solid rgba(255,209,102,.3);
-  color:#c9a76a;padding:12px;border-radius:12px;
-  width:100%;cursor:pointer;font-family:inherit;font-size:.85rem;
-  position:relative;
-}
-#premium-box .close-x{
-  position:absolute;top:14px;right:16px;
-  background:transparent;border:none;color:#c9a76a;
-  font-size:24px;cursor:pointer;line-height:1;z-index:2;
-}
+#premium-box .btn-later{background:transparent;border:1px solid rgba(255,209,102,.3);color:#c9a76a;padding:12px;border-radius:12px;width:100%;cursor:pointer;font-family:inherit;font-size:.85rem;position:relative}
+#premium-box .close-x{position:absolute;top:14px;right:16px;background:transparent;border:none;color:#c9a76a;font-size:24px;cursor:pointer;line-height:1;z-index:2}
 </style>
 </head>
 <body>
@@ -235,6 +118,7 @@ html,body{width:100%;min-height:100dvh;background:radial-gradient(ellipse at top
   <div class="hero">
     <h1>Tu galaxia de amor</h1>
     <p>Personaliza, visualiza y descarga</p>
+    <div id="premium-active-banner">👑 Eres Premium · Todas las opciones desbloqueadas</div>
   </div>
 
   <div class="card">
@@ -273,7 +157,7 @@ Contigo todo es mejor"></textarea>
     </div>
 
     <div class="fld">
-      <label>Tus fotos <span class="opt">máx. 8 gratis</span></label>
+      <label>Tus fotos <span class="opt" id="photos-limit-text">máx. 8 gratis</span></label>
       <label class="file-drop" for="i-photo" id="file-drop">
         <span id="f-label">📷 Añadir fotos</span>
         <input id="i-photo" type="file" accept="image/*" multiple hidden>
@@ -305,7 +189,7 @@ Contigo todo es mejor"></textarea>
     </div>
 
     <div class="fld">
-      <label>Música de fondo <span class="premium-tag">PREMIUM</span></label>
+      <label>Música de fondo <span class="premium-tag" id="music-tag">PREMIUM</span></label>
       <label class="file-drop premium" for="i-music" id="music-drop">
         <span id="m-label">🎵 Subir mi canción</span>
         <input id="i-music" type="file" accept="audio/*" hidden>
@@ -313,16 +197,16 @@ Contigo todo es mejor"></textarea>
     </div>
 
     <div class="fld">
-      <label>Fotos ilimitadas <span class="premium-tag">PREMIUM</span></label>
-      <label class="file-drop premium" for="i-photo-plus">
+      <label>Fotos ilimitadas <span class="premium-tag" id="photos-tag">PREMIUM</span></label>
+      <label class="file-drop premium" for="i-photo-plus" id="photos-plus-drop">
         <span>📸 Añadir más de 8 fotos</span>
         <input id="i-photo-plus" type="file" accept="image/*" multiple hidden>
       </label>
     </div>
 
     <div class="fld">
-      <label>Efectos exclusivos <span class="premium-tag">PREMIUM</span></label>
-      <button type="button" class="file-drop premium" id="premium-fx" style="cursor:pointer;font-family:inherit;color:#ffd166">
+      <label>Efectos exclusivos <span class="premium-tag" id="fx-tag">PREMIUM</span></label>
+      <button type="button" class="file-drop premium" id="premium-fx" style="cursor:pointer;font-family:inherit">
         ✨ Corazón de partículas al iniciar
       </button>
     </div>
@@ -346,61 +230,39 @@ Contigo todo es mejor"></textarea>
   <button id="btn-generate" class="btn btn-primary">💾 Descargar</button>
 </div>
 
-<!-- Botón flotante con logo WhatsApp -->
 <button id="share-float" aria-label="Compartir">
   <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
     <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
   </svg>
 </button>
 
-<!-- Menú compartir -->
 <div id="share-menu">
   <div id="share-menu-box">
-    <h3>
-      Compartir esta página
-      <button id="share-close" aria-label="Cerrar">×</button>
-    </h3>
+    <h3>Compartir esta página <button id="share-close" aria-label="Cerrar">×</button></h3>
     <p>Comparte el editor para que otros creen su propia galaxia</p>
-
     <a id="share-wa" class="share-opt share-wa" href="#" target="_blank" rel="noopener">
-      <div class="ico">
-        <svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
-      </div>
-      <div class="txt">
-        <b>WhatsApp</b>
-        <span>Enviar por WhatsApp</span>
-      </div>
+      <div class="ico"><svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg></div>
+      <div class="txt"><b>WhatsApp</b><span>Enviar por WhatsApp</span></div>
     </a>
-
     <button id="share-copy" class="share-opt share-copy" type="button">
       <div class="ico">🔗</div>
-      <div class="txt">
-        <b>Copiar enlace</b>
-        <span>Copiar el link del editor</span>
-      </div>
+      <div class="txt"><b>Copiar enlace</b><span>Copiar el link del editor</span></div>
     </button>
-
     <button id="share-sys" class="share-opt share-sys" type="button">
       <div class="ico">📱</div>
-      <div class="txt">
-        <b>Más opciones</b>
-        <span>Usar el compartir del sistema</span>
-      </div>
+      <div class="txt"><b>Más opciones</b><span>Usar el compartir del sistema</span></div>
     </button>
   </div>
 </div>
 
-<!-- Modal Premium -->
 <div id="premium-modal">
   <div id="premium-box">
     <button class="close-x" id="premium-close">×</button>
     <div class="crown">👑</div>
     <h2>Función Premium</h2>
     <div class="subtitle">Desbloquea todo el potencial</div>
-    <div class="feature" id="premium-feature-text">
-      <b>Esta función</b> te permite llevar tu galaxia al siguiente nivel.
-    </div>
-    <div class="price">$49 MXN</div>
+    <div class="feature" id="premium-feature-text"><b>Esta función</b> te permite llevar tu galaxia al siguiente nivel.</div>
+    <div class="price">$79 MXN</div>
     <div class="price-note">Pago único · Acceso de por vida</div>
     <button class="btn-upgrade" id="premium-upgrade">✨ Desbloquear Premium</button>
     <button class="btn-later" id="premium-later">Quizás después</button>
@@ -413,6 +275,10 @@ Contigo todo es mejor"></textarea>
 <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
 
 <script>
+/* ========== DETECCIÓN DE PREMIUM ========== */
+var isPremium = (localStorage.getItem("peri_premium_activated") === "1");
+var MAX_PHOTOS = isPremium ? 9999 : 8;
+
 var LOVE_PHRASES = ("Te amo|Eres mi todo|Mi corazón es tuyo|Eres mi universo|Sin ti no soy nada|Eres mi razón de ser|Te pienso a cada instante|Mi vida es tuya|Eres mi sueño hecho realidad|Contigo todo es mejor|Eres mi persona favorita|Te elegiría mil veces|Eres mi hogar|Mi lugar seguro eres tú|Eres mi paz|Eres mi caos favorito|Te amaré siempre|Mi amor por ti es infinito|Eres mi estrella|Eres mi luz|Brillas más que todas las estrellas|Eres mi felicidad|Me haces muy feliz|Eres mi mejor casualidad|Te llevo en el alma|Eres mi destino|Mi corazón late por ti|El amor de mi vida|Mi persona|Mi todo|Mi vida|Mi amor|Mi cielo|Mi sol|Mi luna|Mi universo entero|Eres perfecta para mí|Eres perfecto para mí|Eres mi debilidad|Tu sonrisa me ilumina|Tus ojos son mi perdición|Me pierdo en tu mirada|Eres mi pensamiento favorito|Pienso en ti sin parar|Te sueño despierto|Eres mi sueño cumplido|Me encantas|Me gustas muchísimo|Me vuelves loco|Estoy loco por ti|Doy todo por ti|Por ti daría el mundo|Por ti cruzaría el universo|Eres mi paraíso|Contigo hasta el fin|Contigo soy feliz|Tú y yo por siempre|Tú y yo hasta el final|Nuestro amor es eterno|Siempre juntos|Juntos para siempre|Eres mi complemento|Eres mi otra mitad|Sin ti me falta algo|Eres mi pedacito de cielo|Eres mi ángel|Mi ángel guardián|Cuido de ti siempre|Te protejo con mi vida|Eres mi tesoro|Mi mayor tesoro|Lo más valioso que tengo|Mi razón de vivir|Por quien respiro|Por quien vivo|Mi motivación diaria|Cada día te amo más|Te amo cada día más|Mi amor crece cada día|Eres mi adicción|Adicto a tu amor|Adicto a ti|Me enamoré de ti|Vuelvo a enamorarme cada día|Enamorado de ti|Locamente enamorado|Perdidamente enamorado|Enamorado hasta los huesos|Amor de mi vida|El amor de mi vida|Mi único amor|Mi gran amor|Mi primer y último amor|Mi amor eterno|Mi amor infinito|Te quiero mucho|Te quiero con el alma|Te quiero con todo mi ser|Te adoro|Te idolatro|Te venero|Te amo sin medida|Te amo sin condiciones|Te amo sin reservas|Te amo con todo mi corazón|Corazón mío|Dueño de mi corazón|Dueña de mi corazón|Mi dueño|Mi dueña|Mi debilidad|Mi fortaleza|Mi refugio|Mi casa|Mi todo entero|Eres mi mundo|Mi mundo entero|Mi planetita|Mi persona especial|Mi persona favorita en el mundo|Mi favorito|Mi favorita|Mi consentido|Mi consentida|Mi niño|Mi niña|Mi bebé|Mi amor chiquito|Mi vida entera|Mi vida misma|Razón de mi existir|Me haces mejor persona|Me haces querer ser mejor|Por ti mejoro cada día|Eres mi inspiración|Mi musa|Mi inspiración diaria|Poeta por ti|Escribiría mil poemas por ti|Canciones para ti|Solo canto por ti|Compongo para ti|Eres mi canción favorita|Mi melodía|Mi sinfonía|Mi ritmo|Mi compás|El latido de mi corazón|El aire que respiro|Mi alimento del alma|Mi oxígeno|Sin ti me ahogo|Contigo respiro|Contigo todo tiene sentido|Contigo es todo bonito|Haces todo más bonito|Embelleces mi vida|Pintas de colores mi mundo|Pintas mi vida|Mi artista favorito|Me gusta cómo eres|Me encanta cómo eres|Eres increíble|Eres maravilloso|Eres maravillosa|Eres espectacular|Eres única|Eres único|No hay otra como tú|No hay otro como tú|Irrepetible|Inigualable|Perfecto para mí|Perfecta para mí|Tal como eres te amo|Te amo tal como eres|Con todos tus defectos te amo|Con todas tus virtudes te amo|Te amo con tus días malos|Amo hasta tus silencios|Amo tus abrazos|Amo tus besos|Amo tu voz|Amo tu risa|Amo tu sonrisa|Amo tu mirada|Amo tus manos|Amo tu forma de ser|Amo estar contigo|Amo tus locuras|Amo tus ocurrencias|Eres mi persona loca favorita|Mi compañero de aventuras|Mi compañera de vida|Compañero de sueños|Compañera eterna|Juntos somos uno|Los dos somos uno|Alma gemela|Mi alma gemela|Mi media naranja|La otra mitad de mí|Sin ti estoy incompleto|Sin ti estoy incompleta|Me complementas|Me completas|Me haces sentir completo|Me haces sentir en casa|Contigo estoy en casa|En tus brazos encuentro paz|En tus abrazos soy feliz|Entre tus brazos me quedo|Quiero envejecer contigo|Contigo hasta viejitos|Quiero toda una vida contigo|Toda la eternidad contigo|Eres mi siempre|Mi para siempre|Mi infinidad|Infinitamente tuyo|Infinitamente tuya|Te amo al infinito|Al infinito y más allá|Hasta el infinito|Hasta la eternidad|Por siempre jamás|Por toda la eternidad|Siempre tuyo|Siempre tuya|Eres y serás mi amor").split("|");
 
 var PALETTES = {
@@ -425,12 +291,12 @@ var PALETTES = {
   stardust:{name:"Blanco estelar",emoji:"🤍",colors:["#ffffff","#e8f0ff","#c0d8ff","#90b0ff","#5060c0"]}
 };
 
-var MAX_PHOTOS = 8;
 var state = {
   name:"Mi amor", fromName:"", startDate:"",
   subtitle:"Una experiencia galáctica te espera",
   message:"Eres mi universo entero ✨\nCada estrella me recuerda a ti.",
-  customPhrases:"", photos:[], palette:"cosmic", photoShape:"square"
+  customPhrases:"", photos:[], palette:"cosmic", photoShape:"square",
+  customMusic: null
 };
 var $ = function(id){ return document.getElementById(id); };
 
@@ -471,13 +337,61 @@ function initPremium(){
   $("premium-later").onclick = function(){ $("premium-modal").classList.remove("show"); };
   $("premium-modal").onclick = function(e){ if (e.target === $("premium-modal")) $("premium-modal").classList.remove("show"); };
   $("premium-upgrade").onclick = function(){
-    showStatus("Función disponible próximamente ✨", false);
+    window.location.href = "premium.html";
   };
-  $("i-music").addEventListener("click", function(e){ e.preventDefault(); showPremium("music"); });
-  $("i-photo-plus").addEventListener("click", function(e){ e.preventDefault(); showPremium("photos"); });
-  $("premium-fx").addEventListener("click", function(e){ e.preventDefault(); showPremium("fx"); });
-  // Los labels premium no deben abrir el file picker
-  $("music-drop").addEventListener("click", function(e){ e.preventDefault(); showPremium("music"); });
+
+  // Si NO es premium, mostrar modal al tocar. Si SÍ, dejar pasar.
+  $("i-music").addEventListener("click", function(e){
+    if (isPremium) return;
+    e.preventDefault();
+    showPremium("music");
+  });
+  $("i-photo-plus").addEventListener("click", function(e){
+    if (isPremium) return;
+    e.preventDefault();
+    showPremium("photos");
+  });
+  $("premium-fx").addEventListener("click", function(e){
+    if (isPremium) return;
+    e.preventDefault();
+    showPremium("fx");
+  });
+  $("music-drop").addEventListener("click", function(e){
+    if (isPremium) return;
+    e.preventDefault();
+    showPremium("music");
+  });
+  $("photos-plus-drop").addEventListener("click", function(e){
+    if (isPremium) return;
+    e.preventDefault();
+    showPremium("photos");
+  });
+}
+
+/* ========== Aplicar estado Premium ========== */
+function applyPremiumState(){
+  if (!isPremium) return;
+
+  // Banner verde
+  var banner = $("premium-active-banner");
+  if (banner) banner.classList.add("show");
+
+  // Tags verdes
+  document.querySelectorAll(".premium-tag").forEach(function(el){
+    el.textContent = "✓ DESBLOQUEADO";
+    el.style.background = "rgba(34,197,94,.12)";
+    el.style.borderColor = "rgba(74,222,128,.4)";
+    el.style.color = "#4ade80";
+  });
+
+  // File-drops premium desbloqueados
+  document.querySelectorAll(".file-drop.premium").forEach(function(el){
+    el.classList.add("unlocked");
+  });
+
+  // Texto de límite de fotos
+  var limTxt = $("photos-limit-text");
+  if (limTxt) limTxt.textContent = "ilimitadas";
 }
 
 /* ========== Fotos ========== */
@@ -499,9 +413,10 @@ function renderPhotoList(){
     block.appendChild(thumb); block.appendChild(meta);
     list.appendChild(block);
   });
+  var limitText = isPremium ? "ilimitadas" : "máx. " + MAX_PHOTOS;
   $("f-label").textContent = state.photos.length === 0
-    ? "📷 Añadir fotos (máx. " + MAX_PHOTOS + ")"
-    : "✓ " + state.photos.length + "/" + MAX_PHOTOS + " · añadir más";
+    ? "📷 Añadir fotos (" + limitText + ")"
+    : "✓ " + state.photos.length + (isPremium ? "" : "/" + MAX_PHOTOS) + " · añadir más";
   $("file-drop").classList.toggle("has-file", state.photos.length > 0);
 }
 
@@ -513,8 +428,11 @@ async function addPhotos(files){
     showPremium("photos");
     return;
   }
-  if (list.length > slots) showPremium("photos");
-  for (var i = 0; i < list.length && i < slots; i++){
+  if (list.length > slots){
+    showPremium("photos");
+    list = list.slice(0, slots);
+  }
+  for (var i = 0; i < list.length; i++){
     var file = list[i];
     var url = await new Promise(function(res){
       var rd = new FileReader();
@@ -633,28 +551,25 @@ async function generateCoverImage(){
   return cv.toDataURL("image/jpeg", 0.85);
 }
 
-/* ========== Música por defecto (Web Audio API - melodía romántica) ========== */
+/* ========== Música por defecto (Pachelbel Canon - romántica) ========== */
 function getDefaultMusicScript(){
   return `
-/* Melodía romántica por defecto usando Web Audio API */
+/* Pachelbel Canon en D - melodía clásica romántica */
 var audioCtx = null;
 var musicPlaying = false;
 var musicTimer = null;
 var musicStep = 0;
+var customAudioEl = null;
 
-/* Progresión de acordes romántica + melodía tipo caja de música */
 var MELODY = [
-  /* Compases en La menor / Fa / Do / Sol */
-  /* Frecuencias (Hz) de la melodía - notas: A4=440, C5=523.25, E5=659.25, G5=783.99 */
-  659.25, 783.99, 880.00, 783.99, 659.25, 523.25, 587.33, 523.25,
-  440.00, 523.25, 659.25, 587.33, 523.25, 440.00, 493.88, 523.25,
-  523.25, 659.25, 783.99, 659.25, 587.33, 523.25, 493.88, 440.00,
-  392.00, 440.00, 523.25, 440.00, 392.00, 349.23, 392.00, 440.00
+  587.33, 440.00, 493.88, 440.00, 392.00, 440.00, 493.88, 587.33,
+  659.25, 587.33, 493.88, 440.00, 493.88, 587.33, 659.25, 783.99,
+  880.00, 783.99, 659.25, 587.33, 659.25, 783.99, 880.00, 987.77,
+  880.00, 659.25, 587.33, 493.88, 587.33, 440.00, 493.88, 587.33
 ];
 var BASS = [
-  /* Notas de bajo suaves (una por cada 4 notas de melodía) */
-  220.00, 174.61, 261.63, 196.00,
-  220.00, 174.61, 261.63, 196.00
+  146.83, 220.00, 246.94, 185.00, 196.00, 146.83, 196.00, 220.00,
+  146.83, 220.00, 246.94, 185.00, 196.00, 146.83, 196.00, 220.00
 ];
 
 function initAudio(){
@@ -668,40 +583,49 @@ function playNote(freq, time, duration, volume){
   if (!audioCtx) return;
   var osc = audioCtx.createOscillator();
   var gain = audioCtx.createGain();
-  // Sonido tipo caja de música: seno + un poco de triángulo
   osc.type = 'sine';
   osc.frequency.value = freq;
   gain.gain.setValueAtTime(0, time);
-  gain.gain.linearRampToValueAtTime(volume, time + 0.02);
+  gain.gain.linearRampToValueAtTime(volume, time + 0.05);
   gain.gain.exponentialRampToValueAtTime(0.0001, time + duration);
   osc.connect(gain);
   gain.connect(audioCtx.destination);
   osc.start(time);
-  osc.stop(time + duration + 0.05);
+  osc.stop(time + duration + 0.1);
 }
 
 function scheduleNextBar(){
   if (!musicPlaying || !audioCtx) return;
   var now = audioCtx.currentTime;
-  var beat = 0.45;
-  // Melodía: 8 notas por compás, 4 compases
+  var beat = 0.55;
   var totalNotes = 32;
   var startStep = musicStep % totalNotes;
-  // Bajo cada 8 notas (2 compases)
-  var bassStep = Math.floor(musicStep / 8) % BASS.length;
-  playNote(BASS[bassStep], now, beat * 7, 0.06);
+
+  var bassStep = Math.floor(musicStep / 4) % BASS.length;
+  playNote(BASS[bassStep], now, beat * 3.5, 0.05);
+  playNote(BASS[(bassStep + 1) % BASS.length], now + beat * 4, beat * 3.5, 0.05);
 
   for (var i = 0; i < 8; i++){
     var idx = (startStep + i) % totalNotes;
     var freq = MELODY[idx];
-    var vol = 0.10 + Math.random() * 0.03;
-    playNote(freq, now + i * beat, beat * 0.9, vol);
+    var vol = 0.09 + Math.random() * 0.02;
+    playNote(freq, now + i * beat, beat * 1.6, vol);
   }
   musicStep += 8;
   musicTimer = setTimeout(scheduleNextBar, beat * 8 * 1000);
 }
 
 function startMusic(){
+  if (CUSTOM_MUSIC){
+    if (!customAudioEl){
+      customAudioEl = new Audio(CUSTOM_MUSIC);
+      customAudioEl.loop = true;
+      customAudioEl.volume = 0.6;
+    }
+    customAudioEl.play().catch(function(){});
+    musicPlaying = true;
+    return;
+  }
   initAudio();
   if (!audioCtx) return;
   if (audioCtx.state === 'suspended') audioCtx.resume();
@@ -711,6 +635,7 @@ function startMusic(){
 function stopMusic(){
   musicPlaying = false;
   if (musicTimer) { clearTimeout(musicTimer); musicTimer = null; }
+  if (customAudioEl) customAudioEl.pause();
 }
 `;
 }
@@ -728,6 +653,7 @@ async function buildGalaxyHTML(){
   var customPhrases = state.customPhrases.split("\n").map(function(l){ return l.trim(); }).filter(function(l){ return l.length > 0; });
   var customJSON = JSON.stringify(customPhrases);
   var startDateJSON = JSON.stringify(state.startDate || null);
+  var customMusicJSON = JSON.stringify(state.customMusic || null);
   var coverDataURL = await generateCoverImage();
   var startSubText = subtitle;
   if (fromName) startSubText = "De " + fromName + " · " + subtitle;
@@ -814,6 +740,7 @@ getDefaultMusicScript() +
 'var PHOTO_SHAPE="' + photoShape + '";\n' +
 'var CUSTOM_PHRASES=' + customJSON + ';\n' +
 'var START_DATE=' + startDateJSON + ';\n' +
+'var CUSTOM_MUSIC=' + customMusicJSON + ';\n' +
 'var MESSAGE=' + JSON.stringify(message) + ';\n' +
 'var PHRASE_COUNT=200;\n' +
 'var $=function(id){return document.getElementById(id);};\n' +
@@ -1225,7 +1152,6 @@ getDefaultMusicScript() +
 'function start(){\n' +
 '  if(started)return;started=true;\n' +
 '  el.start.classList.add("hidden");el.hint.classList.add("show");isStarted=true;\n' +
-'  /* Iniciar música romántica por defecto */\n' +
 '  try { startMusic(); el.musicBtn.classList.add("playing"); } catch(e){}\n' +
 '  setTimeout(function(){\n' +
 '    if(PHOTOS.length){\n' +
@@ -1260,7 +1186,6 @@ getDefaultMusicScript() +
 '</html>';
 }
 
-/* ========== Visualizar ========== */
 async function visualize(){
   readInputs();
   if (state.photos.length === 0){ showStatus("Añade al menos una foto", false); return; }
@@ -1281,7 +1206,6 @@ async function visualize(){
   }
 }
 
-/* ========== Descargar ========== */
 async function download(){
   readInputs();
   if (state.photos.length === 0){ showStatus("Añade al menos una foto", false); return; }
@@ -1289,8 +1213,6 @@ async function download(){
   try {
     var html = await buildGalaxyHTML();
     var sizeKB = (html.length / 1024).toFixed(1);
-    console.log("Tamaño HTML:", sizeKB, "KB");
-
     var blob = new Blob([html], { type: "text/html;charset=utf-8" });
     var url = URL.createObjectURL(blob);
     var a = document.createElement("a");
@@ -1301,12 +1223,9 @@ async function download(){
     a.click();
     a.remove();
     setTimeout(function(){ URL.revokeObjectURL(url); }, 5000);
-
     showStatus("¡Descargado! (" + sizeKB + " KB)");
     renderQR(fname, sizeKB);
-    setTimeout(function(){
-      window.scrollTo({ top: document.body.scrollHeight, behavior: "smooth" });
-    }, 150);
+    setTimeout(function(){ window.scrollTo({ top: document.body.scrollHeight, behavior: "smooth" }); }, 150);
   } catch(err){
     console.error(err);
     showStatus("Error: " + err.message, false);
@@ -1325,9 +1244,7 @@ function renderQR(fname, sizeKB){
   }
   var canvas = document.createElement("canvas");
   wrap.appendChild(canvas);
-  QRCode.toCanvas(canvas, qrContent, { width: 200, margin: 1, color: { dark: "#000308", light: "#ffffff" } }, function(err){
-    if (err) console.error(err);
-  });
+  QRCode.toCanvas(canvas, qrContent, { width: 200, margin: 1, color: { dark: "#000308", light: "#ffffff" } }, function(err){ if (err) console.error(err); });
   var info = document.createElement("div");
   info.style.marginTop = "10px"; info.style.fontSize = ".75rem"; info.style.color = "#7c93b0";
   info.innerHTML = '<b style="color:#a8d8ff">' + escapeHtml(fname) + '</b><br>' + sizeKB + ' KB · ' + state.photos.length + ' foto' + (state.photos.length>1?'s':'');
@@ -1370,6 +1287,29 @@ function initShare(){
 
 function initEditor(){
   $("i-photo").addEventListener("change", function(e){ addPhotos(e.target.files); e.target.value = ""; });
+
+  $("i-music").addEventListener("change", function(e){
+    if (!isPremium){ e.target.value = ""; return; }
+    var file = e.target.files[0];
+    if (!file) return;
+    if (!file.type.startsWith("audio/")){ showStatus("Solo archivos de audio", false); return; }
+    if (file.size > 5 * 1024 * 1024){ showStatus("Máximo 5 MB de audio", false); return; }
+    var rd = new FileReader();
+    rd.onload = function(ev){
+      state.customMusic = ev.target.result;
+      $("m-label").textContent = "✓ " + file.name;
+      $("music-drop").classList.add("has-file");
+      showStatus("Música cargada ✓");
+    };
+    rd.readAsDataURL(file);
+  });
+
+  $("i-photo-plus").addEventListener("change", function(e){
+    if (!isPremium) return;
+    if (e.target.files && e.target.files.length) addPhotos(e.target.files);
+    e.target.value = "";
+  });
+
   $("btn-view").addEventListener("click", visualize);
   $("btn-generate").addEventListener("click", download);
   ["i-name","i-from","i-date","i-sub","i-msg","i-phrases"].forEach(function(id){
@@ -1383,6 +1323,7 @@ function initEditor(){
   initShapes();
   renderPhotoList();
   initPremium();
+  applyPremiumState();
 }
 
 initEditor();
